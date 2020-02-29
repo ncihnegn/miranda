@@ -1,5 +1,7 @@
 *.o
 *.x
+.host
 fdate
 mira
 miralib/menudriver
+miralib/preludx
