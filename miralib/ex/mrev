@@ -1,0 +1,22 @@
+#! /usr/bin/mira -exec
+main :: [sys_message]
+main = map f (tl $*),          if # $* > 1 ||$* is equivalent to argv
+     = [Stdout (revlines $-)], otherwise   ||no files, use stdin ($-)
+
+f :: [char]->sys_message
+f fil = Stderr ("mrev: cannot open "++fil++"\n"), if badfile
+      = Stdout (revlines (read fil)), otherwise
+	where
+	badfile = ~ member (filemode fil) 'r'
+
+revlines :: [char]->[char]
+revlines = lay.map reverse.lines
+
+||The usage of this command (from a UNIX shell) is
+||	mrev [file] ...
+||If no files given, takes data from stdin.  This is a  Miranda  version
+||of the UNIX command `rev' which reverses each line of its input.
+
+||This example is a template for turning any Miranda  function  of  type
+||[char]->[char]  into  a  UNIX filter.  Replace `revlines' in the above
+||text, by your chosen function.

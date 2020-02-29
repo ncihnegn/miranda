@@ -1,0 +1,92 @@
+_D_e_f_i_n_i_t_i_o_n_s
+
+The purpose of a definition is to give a value to one or more variables.
+There  are  two kinds of definition, `scalar' and `conformal'.  A scalar
+definition gives a value to a single variable, and consists  of  one  or
+more consecutive equations of the form
+	fnform = rhs
+
+where  a `fnform' consists of the name being defined followed by zero or
+more formal parameters.  Here are three examples of scalar  definitions,
+of `answer', `sqdiff' and `equal' respectively
+	answer = 42
+
+	sqdiff a b = a^2 - b^2
+
+        equal a a = True
+	equal a b = False
+
+When a scalar definition consists of more than one equation,  the  order
+of the equations can be significant, as the last example shows.  (Notice
+that `equals' as defined here is a function of two  arguments  with  the
+same action as the built in `=' operator of boolean expressions.)
+
+A conformal definition gives values to several variables  simultaneously
+and is an equation of the form
+	pattern = rhs
+
+An example of this kind of definition is
+	(x,y,z) = ploggle
+
+For this to make sense, the value of  `ploggle'  must  of  course  be  a
+3-tuple.    More  information  about  the  _p_a_t_t_e_r_n  _m_a_t_c_h_i_n_g  aspect  of
+definitions is given in the manual section of that name.
+
+Both fnform and pattern equations share a common notion of  `right  hand
+side'
+
+_R_i_g_h_t_ _h_a_n_d_ _s_i_d_e_s
+
+The simplest form of rhs is just an expression (as in all the  equations
+above).   It  is  also possible to give several alternative expressions,
+distinguished by guards.  A guard consists of the word `if' followed  by
+a  boolean  expression.   An  example  of a right hand side with several
+alternatives is given by the following definition of the greatest common
+divisor function, using Euclid's algorithm
+	gcd a b = gcd (a-b) b,	_i_f a>b
+                = gcd a (b-a),	_i_f a<b
+		= a,		_i_f a=b
+
+Note that the guards are written on the right, following a  comma.   The
+layout  is  significant (because the offside rule is used to resolve any
+ambiguities in the parse).
+
+The last guard can be written `otherwise', to indicate that this is  the
+case  which  applies if all the other guards are false.  For example the
+correct rule for recognising a leap year can be written:
+	leap y = y _d_i_v 400 = 0,    _i_f y _m_o_d 100 = 0
+	       = y _d_i_v 4 = 0,      _o_t_h_e_r_w_i_s_e
+
+The _o_t_h_e_r_w_i_s_e may here be regarded as standing for _i_f y _m_o_d  100  ~=  0.
+In  the  general  case it abbreviates the conjunction of the negation of
+all the previous guards, and may be used to avoid  writing  out  a  long
+boolean expression.
+
+Although it is better style to write guards that are mutually exclusive,
+this is not something the compiler can enforce - in the general case the
+alternative selected is the first (in the order they are written)  whose
+guard evaluates to True.
+
+[In older versions of Miranda the presence of the keyword `if' after the
+guard comma was optional.]
+
+_B_l_o_c_k_ _s_t_r_u_c_t_u_r_e
+
+A right hand side can be qualified by a _w_h_e_r_e clause.  This  is  written
+after the last alternative.  The bindings introduced by the _w_h_e_r_e govern
+the whole rhs, including the guards.  Example
+	foo x = p + q, _i_f p<q
+	      = p - q, _i_f p>=q
+		_w_h_e_r_e
+		p = x^2 + 1
+		q = 3*x^3 - 5
+
+Notice that the whole _w_h_e_r_e clause must be indented, to show that it  is
+part  of  the  rhs.  Following a _w_h_e_r_e can be any number of definitions,
+and the syntax of such local definitions is exactly the same as that for
+top level definitions (including therefore, recursively, the possibility
+that they may contain nested _w_h_e_r_e's).
+
+It is not  permitted  to  have  locally  defined  types,  however.   New
+typenames can be introduced only at top level.
+

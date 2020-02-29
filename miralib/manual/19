@@ -1,0 +1,18 @@
+_T_y_p_e_ _s_y_n_o_n_y_m_ _d_e_c_l_a_r_a_t_i_o_n_s
+
+These permit the user to introduce a new name for  an  already  existing
+type, e.g.
+	string == [char]
+type  synonyms  are  entirely transparent to the typechecker (it best to
+think of them as being just macros). For obvious reasons, recursive type
+synonyms are not permitted.
+
+It  is also possible to introduce a synonym for a type forming operator,
+by introducing generic type variable as parameters  of  the  definition,
+e.g.
+	invt * ** == (*->**)->(**->*)
+
+So  within  a script containing the above two `==' definitions, the type
+`invt num string' will be shorthand for
+	(num->[char])->([char]->num)
+

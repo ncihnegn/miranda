@@ -1,0 +1,38 @@
+#! /bin/sh
+#shell script for creating combs.h cmbnms.c
+#needs to be run if list of combinators changes
+
+hdr='/* file created by gencdecs - do not edit manually */'
+
+echo "$hdr" > combs.h
+echo "$hdr" > cmbnms.c
+
+echo 'char *cmbnms[] = {' >> cmbnms.c
+i=0
+
+for c in S K Y C B CB I HD TL BODY LAST S_p U Uf U_ Ug COND EQ NEQ \
+         NEG AND OR NOT APPEND STEP STEPUNTIL GENSEQ MAP ZIP TAKE \
+         DROP FLATMAP FILTER FOLDL MERGE FOLDL1 LIST_LAST FOLDR MATCH \
+         MATCHINT TRY SUBSCRIPT ATLEAST P B_p C_p S1 B1 C1 ITERATE \
+         ITERATE1 SEQ FORCE MINUS PLUS TIMES INTDIV FDIV MOD GR GRE \
+         POWER CODE DECODE LENGTH ARCTAN_FN EXP_FN ENTIER_FN LOG_FN \
+         LOG10_FN SIN_FN COS_FN SQRT_FN FILEMODE FILESTAT GETENV EXEC WAIT \
+         INTEGER SHOWNUM SHOWHEX SHOWOCT SHOWSCALED SHOWFLOAT NUMVAL STARTREAD \
+         STARTREADBIN NB_STARTREAD READVALS NB_READ READ READBIN GETARGS Ush Ush1 KI \
+         G_ERROR G_ALT G_OPT G_STAR G_FBSTAR G_SYMB G_ANY G_SUCHTHAT \
+         G_END G_STATE G_SEQ G_RULE G_UNIT G_ZERO G_CLOSE G_COUNT \
+	 LEX_RPT LEX_RPT1 LEX_TRY LEX_TRY_ LEX_TRY1 LEX_TRY1_ DESTREV \
+	 LEX_COUNT LEX_COUNT0 LEX_FAIL LEX_STRING LEX_CLASS LEX_CHAR \
+         LEX_DOT LEX_SEQ LEX_OR LEX_RCONTEXT LEX_STAR LEX_OPT \
+         MKSTRICT BADCASE CONFERROR ERROR FAIL False True NIL NILS UNDEF
+do
+   echo "#define $c (CMBASE+$i)" >> combs.h
+   i=`expr $i + 1`
+   echo \"$c\"\, >> cmbnms.c
+done
+
+echo "#define ATOMLIMIT (CMBASE+$i)" >> combs.h
+echo '0};' >> cmbnms.c
+
+#./.nextxversion
+#changing .xversion causes old .x files to be discarded as obsolete

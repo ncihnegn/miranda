@@ -1,0 +1,44 @@
+_T_h_e_ _%_i_n_c_l_u_d_e_ _d_i_r_e_c_t_i_v_e_ _(_b_a_s_i_c_ _i_n_f_o_r_m_a_t_i_o_n_)
+
+Suppose the file "mylib.m" contains  some  Miranda  declarations  (which
+could be any kind of legal Miranda declaration, eg function definitions,
+type definitions etc).  To make these in scope in  another  script,  the
+latter will contain the directive
+	%_i_n_c_l_u_d_e "mylib"
+
+This  can  come  anywhere  in  the  script  (there  is  for  example  no
+requirement  that  %_i_n_c_l_u_d_e directives come at the front) but must be at
+top level - you may not  place  a  %_i_n_c_l_u_d_e  directive  inside  a  _w_h_e_r_e
+clause.  The subject of a %_i_n_c_l_u_d_e directive may itself contain %_i_n_c_l_u_d_e
+directives, and so on (to any reasonable depth).
+
+By  default,  the names `exported' from an included script are all those
+defined in it at top level, but  not  those  of  subsidiary  %_i_n_c_l_u_d_e's.
+This  can  be  modified by placing a `%_e_x_p_o_r_t' directive in the included
+script.  For a discussion of this and other ways of modifying the effect
+of  %_i_n_c_l_u_d_e  see  the  manual  section giving a detailed account of the
+library directives.
+
+If the filename in a _%_i_n_c_l_u_d_e directive is enclosed  in  angle  brackets
+instead  of  string quotes, this is understood to be a pathname relative
+to the miralib directory.  So for example putting in your script
+	%_i_n_c_l_u_d_e <ex/matrix>
+brings into scope the definitions exported from the  matrix  package  in
+the Miranda examples directory `ex'.  (*See note below.)
+
+Finally, note that that the relationship between includor  and  includee
+is unsymmetrical.  If file A %_i_n_c_l_u_d_e's file B, then the declarations of
+B are visible to A, but not vice versa.
+
+There is a simpler (purely textual) directive
+	%_i_n_s_e_r_t "file"
+which causes the contents of "file" to be substituted  for  the  %_i_n_s_e_r_t
+directive during lexical analysis.  This can occur anywhere in a Miranda
+script.  See manual section on compiler directives.
+
+------------------------------------------------------------------------
+(*) Note  to  system  administrators:  an  empty  directory  `local'  is
+provided  under the miralib directory, in which you can place additional
+libraries which you wish to make available to all Miranda users at  your
+site.
+

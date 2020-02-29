@@ -1,0 +1,4 @@
+ls -t `make -s sources` | ./fdate
+
+#output the date of most recently revised source file
+#e.g   9 July 2004

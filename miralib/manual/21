@@ -1,0 +1,133 @@
+_A_b_s_t_r_a_c_t_ _t_y_p_e_ _d_e_f_i_n_i_t_i_o_n_s
+
+These enable a new data type to be defined by data type abstraction from
+an existing type.  We give the classic example, that of defining `stack'
+as an abstract data type (here based on lists)
+	_a_b_s_t_y_p_e stack *
+	_w_i_t_h empty::stack *
+	     push::*->stack *->stack *
+	     isempty::stack *->bool
+	     top::stack *->*
+	     pop::stack *->stack *
+
+	stack * == [*]
+	empty = []
+	push a x = a:x
+	isempty x = x=[]
+	top (a:x) = a
+	pop (a:x) = x
+
+The information given after  `_w_i_t_h'  is  called  the  _s_i_g_n_a_t_u_r_e  of  the
+abstract  type - the definitions of the identifiers in the signature are
+called the `implementation equations' (these are the six equations given
+above).   Outside  of  the implementation equations the information that
+stacks are implemented as lists is not available  -  []  and  empty  for
+example  are incomparable objects of two different and unrelated types (
+[*] and stack * respectively).  Only inside the implementation equations
+are   the   abstract  objects  treated  as  being  equivalent  to  their
+representations.
+
+The implementation equations do not have to appear immediately after the
+corresponding  _a_b_s_t_y_p_e  declaration  -  they  can  occur anywhere in the
+script.  For readability, however, it is strongly recommended  that  the
+implementation   equations   appear   immediately   after   the  _a_b_s_t_y_p_e
+declaration.
+
+Note  that  in  Miranda  there  is  no  runtime  cost  associated   with
+administering  an  abstract data type.  The responsibility for enforcing
+the distinction between stacks and lists,  for  example,  is  discharged
+entirely   at   compile   time  (by  the  type  checker).   The  runtime
+representation of a stack does not require any extra bits to distinguish
+it  from  a  list.   As  a  result the Miranda programmer can freely use
+abstract data types to structure his programs without incurring any loss
+of efficiency by doing so.
+
+Notice that the mechanism used  to  introduce  abstract  data  types  in
+Miranda  does  not  depend  on  the  hiding  of identifiers, and in this
+respect differs from the traditional approach.  A fuller  discussion  of
+the Miranda _a_b_s_t_y_p_e mechanism can be found in [*Turner 85].
+
+------------------------------------------------------------------------
+(*) D.  A.  Turner ``Miranda:  A  Non-Strict  Functional  Language  with
+Polymorphic   Types'',   Proceedings   IFIP   Conference  on  Functional
+Programming  Languages  and  Computer   Architecture,   Nancy,   France,
+September 1985 (Springer Lecture Notes in Computer Science, vol. 201, pp
+1-16).
+------------------------------------------------------------------------
+
+_T_h_e_ _p_r_i_n_t_ _r_e_p_r_e_s_e_n_t_a_t_i_o_n_ _o_f_ _a_b_s_t_r_a_c_t_ _o_b_j_e_c_t_s
+ ("advanced feature" - omit on first reading)
+
+Values  belonging  to an abstract type are not in general printable.  If
+the value of a command-level expression  is  of  such  a  type  it  will
+normally print simply as
+
+<abstract ob>
+
+This is because the special function _s_h_o_w (which is actually a family of
+functions, see elsewhere) has no  general  method  for  converting  such
+objects to a printable form.  It is possible to extend the definition of
+_s_h_o_w to include the ability to print members of an abstract type,  using
+some appropriate format.  The convention for doing this is to include in
+the definition of the abstract type a function with the  name  `showfoo'
+(where `foo' is the name of the abstract type involved).
+
+We illustrate how this is done taking `stack' as the  example.   Suppose
+we  decide we wish stacks to print - using a syntax such that the output
+could be read back in (e.g. by readvals - see elsewhere) to generate the
+same stack.
+
+ empty is to print as "empty"
+ push 1 empty is to print as "(push 1 empty)"
+ and so on.
+
+Note that we decide to fully parenthesise the output for safety -  since
+we  do  not  know  the  larger  context in which our stack output may be
+embedded.
+
+Because  `stack'  is  a  polymorphic abstraction, showstack will need to
+take as a parameter the appropriate show function for the  element  type
+(which  is num in the above examples, but could have been any type).  We
+add to the signature of stack the following function.
+
+     showstack::(*->[char])->stack *->[char]
+
+To obtain the output format illustrated above, an appropriate definition
+of showstack would be,
+
+    showstack f [] = "empty"
+    showstack f (a:x) = "(push " ++ f a ++ " " ++ showstack f x ++ ")"
+
+If this definition is included in the script, stacks  become  printable,
+using  the  specified  format.  The effect is to extend the behaviour of
+the special built-in function  _s_h_o_w  to  handle  stacks,  and  all  data
+structures  built using stacks (such as list of tree of stacks, stack of
+stacks and so on).
+
+The general rule is as follows.  Let `foo' be an abstract type name.  To
+make foo's printable, we need to define a `showfoo' thus:
+
+	if foo is a simple type (not polymorphic)
+	showfoo :: foo -> [char]
+
+	if foo is polymorphic in one type variable (foo *)
+	showfoo :: (*->[char]) -> foo * -> [char]
+
+	if foo is polymorphic in two type variables (foo * **)
+	showfoo :: (*->[char]) -> (**->[char]) -> foo * ** -> [char]
+
+and so on.  Note  that  the  show  function  must  be  declared  in  the
+signature  of  the  abstract  type, and that the name of the function is
+significant - if we change its name from  `showfoo'  to  `gobbledegook',
+its  definition  will cease to have any effect on the behaviour of _s_h_o_w.
+It also needs to have the right type, and if  it  does  not,  again  its
+presence  will have no effect on the behaviour of _s_h_o_w (in this case the
+compiler prints a warning message).
+
+[Note on library directives: If you %export an abstract type,  foo  say,
+to  another  file,  it  is not necessary to %export the showfoo function
+explicitly to preserve the correct printing behaviour - if  an  abstract
+type  comes  into  existence  with  a show function in its signature the
+compiler will `remember' how to print objects of the type even in scopes
+where the show function has no name.]
+

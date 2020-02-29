@@ -1,0 +1,261 @@
+_S_o_m_e_ _g_u_i_d_e_l_i_n_e_s_ _o_n_ _g_o_o_d_ _p_r_o_g_r_a_m_m_i_n_g_ _s_t_y_l_e_ _i_n_ _M_i_r_a_n_d_a
+
+We give here a series of suggested guidelines for good programming style
+in  Miranda.   The  list is not meant to be exhaustive.  These rules are
+also not intended to be followed in all cases, regardless of conflicting
+considerations.   That  is  why they are only suggestions for good style
+and not grammar rules.
+
+_A_v_o_i_d_ _t_h_e_ _i_n_d_i_s_c_r_i_m_i_n_a_t_e_ _u_s_e_ _o_f_ _r_e_c_u_r_s_i_o_n
+  A Miranda script that consists of large number of functions which call
+each  other  in  an apparently random fashion is no easier to understand
+than, say, a piece of FORTRAN code which is written as a rat's  nest  of
+GOTO  statements.  An excessive reliance on recursion (especially mutual
+recursion) can be an indication  of  a  weak  programming  style.   Some
+pointers:
+
+Use  list  comprehensions,  `..'  lists,  and  library   functions,   in
+preference  to  ad-hoc recursion.  For example it is probably clearer to
+define factorial by writing
+	fac n = product[1..n]
+
+than to define it from first principles, as
+	fac 0 = 1
+	fac (n+1) = (n+1) * fac n
+
+and  to  define  the  cartesian  product  of  two  lists   by   a   list
+comprehension, thus
+	cp x y = [(a,b)|a<-x;b<-y]
+
+is certainly a lot clearer than the recursive definition,
+	cp (a:x) y = f y ++ cp x y
+		     where
+		     f (b:y) = (a,b): f y
+		     f [] = []
+	cp [] y = []
+
+The standard environment contains a number  of  useful  list  processing
+functions  (eg  map filter reverse foldr foldl) with whose properties it
+is worth becoming familiar.  They capture common patterns  of  recursion
+over  lists, and can often be used to simplify your code, and reduce the
+reliance on `ad-hoc' recursion.  Programs using list comprehensions  and
+standard  functions  are  also  likely  to  run  faster  (on the current
+implementation) than equivalent programs using ad-hoc recursion.
+
+The standard environment is only a basic collection  of  useful  general
+purpose  functions.   As you get used to programming in Miranda you will
+probably begin to discover other useful functions  that  express  common
+patterns  of  recursion (perhaps over data structures other than lists).
+It is a good practice to collect such functions in  libraries  (together
+with  some explanations of their properties) so that you can reuse them,
+and share them with others.  Not all of them will survive  the  test  of
+time, but it cannot hurt to experiment.
+
+To cause the definitions from such a library to be in scope  in  another
+script  you  would  use  a  `%include'  directive (see manual section on
+library directives).
+
+_A_v_o_i_d_ _u_n_n_e_c_e_s_s_a_r_y_ _n_e_s_t_i_n_g_ _o_f_ _d_e_f_i_n_i_t_i_o_n_s
+ Scripts  that  get  deeply  nested  in  where-clauses  are  harder   to
+understand,  harder  to  reason about formally, harder to debug (because
+functions defined inside where's cannot be exercised seperately)  slower
+to compile, and generally more difficult to work with.
+
+A  well  structured  script  will  consist  of  a  series  of  top-level
+definitions,  each  of which (if it carries a where-clause at all) has a
+fairly small number of local definitions.  A third level  of  definition
+(where inside where) should be used only very occasionally.  [And if you
+find yourself  getting  nested  four  and  five  levels  deep  in  block
+structure you can be pretty sure that your program has gone badly out of
+control.]
+
+A function should normally be placed inside a where clause only if it is
+logically  necessary to do so (which will be the case when it has a free
+variable which is not in scope  outside  the  where  clause).   If  your
+script consists, of say six functions, one of which solves a problem and
+the other five of which are auxiliary to it, it is probably not  a  good
+style  to put the five subsidiary functions inside a where clause of the
+main one.  It is usually better to make all six top  level  definitions,
+with the important one written first, say.
+
+There are several reasons for this.  First that  it  makes  the  program
+easier  to read, since it consists of six separate chunks of information
+rather than one big one.  Second that the  program  is  much  easier  to
+debug,  because  each  of  its functions can be exercised separately, on
+appropriate test data,  within  a  Miranda  session.   Third  that  this
+program structure is more robust for future development - for example if
+we later wish to add a second `main' function that  solves  a  different
+problem  by  using  the same five auxiliary functions in another way, we
+can do so without having to restructure any existing code.
+
+There is a temptation to use `where' to hide  information  that  is  not
+relevant at top-level.  This may be misguided (especially if it leads to
+code with large and complex where-clauses).  If you don't  wish  all  of
+your  functions  or  data  structures  to be "visible" from outside, the
+proper way to do this is to include a `%export' directive in the script.
+
+Note also that (in the current implementation) functions defined  inside
+a  "where" clause cannot have their types explicitly specified.  This is
+a further reason to avoid putting structure inside a where  clause  that
+does not logically have to be there.
+
+_S_p_e_c_i_f_y_ _t_h_e_ _t_y_p_e_s_ _o_f_ _t_o_p_ _l_e_v_e_l_ _i_d_e_n_t_i_f_i_e_r_s
+ The Milner  type  discipline  is  an  impressive  advance  in  compiler
+technology.   It  is  also  a  trap  for  the unwary.  The fact that the
+Miranda compiler will accept several hundred lines  of  code  without  a
+single  type  specification,  and  correctly  infer the types of all the
+identifiers does NOT mean that it is sensible to write code with no type
+information.   (Compare:  compilers will also accept large programs with
+no comments in, but that doesn't make such programs sensible.)
+
+For other than fairly small scripts  it  is  good  style  to  insert  an
+explicit  specification  of  the  type of any top level identifier whose
+type  is  not  immediately   apparent   from   its   definition.    Type
+specifications look like this
+	ack::num->num->num
+says that `ack' is a function taking two numbers and returning a number.
+A type specification can occur anywhere in a script,  either  before  or
+after  the  definition of the corresponding identifier, but common sense
+suggests that the best place for it is  just  before  the  corresponding
+definition.   
+
+If in doubt it is always better to put in a type specification  than  to
+leave it out.  The compiler may not need this extra type information but
+human  beings  definitely  do.   The  extra  type  information   becomes
+particularly important when your code reaches the level of complexity at
+which you start to make type errors.
+
+If your script contains a type error it is unreasonable  to  expect  the
+compiler to correctly locate the real source of the error in the absence
+of explicit type declarations.  A type error means  different  parts  of
+your  code are inconsistent with one another in their use of identifiers
+- if you have not given the compiler any information about the  intended
+use  of  an  identifier,  you  cannot expect it to know which of several
+conflicting uses are the `wrong' ones.  In such a case it can only  tell
+you  that  something  is  wrong, and indicate the line on which it first
+deduced an inconsistency - which may be many lines later than the `real'
+error.   Explicit  type  declarations  make it much more likely that the
+compiler will spot the `real  error'  on  the  line  where  it  actually
+occurs.
+
+Code containing explicit type information is  also  incomparably  easier
+for other people to read.
+
+_U_s_e_ _s_a_f_e_ _l_a_y_o_u_t
+ This is a point to do with the operation of the offside  rule.   It  is
+most  easily  explained  by means of an example.  Consider the following
+definition, here assumed to be part of a larger script
+
+	hippo = (rhino - swan)/piglet
+		_w_h_e_r_e
+		piglet = 17
+		rhino = 63
+		swan = 29
+
+Some time after writing this we  carry  out  a  global  edit  to  expand
+`hippo' to `hippopotamus'.  The definition now looks like this.
+
+	hippopotamus = (rhino - swan)/piglet
+		_w_h_e_r_e
+		piglet = 17
+		rhino = 63
+		swan = 29
+
+the where-clause has become offside, and the definition will  no  longer
+compile.   Worse,  it is possible (with a little ingenuity) to construct
+examples of layout where changing the length of an identifier will  move
+a  definition  from  one  level  of scope to another, so that the script
+still  compiles  but  now  has  a  different  meaning!!!   Replacing  an
+identifier by a shorter one can cause similar difficulties with layout.
+
+The layout of the `hippo' definition was unsafe, because  the  level  of
+indentation  depended on the length of an identifier.  There are several
+possible styles of `safe' layout.  The basic rule to follow is:
+
+	Whenever a right hand side goes on for more than one line
+	(because it consists of a set of guarded  cases, or because it
+	carries a where clause, or just because it is an expression too
+	big to fit on one line), you should take a newline BEFORE
+	starting the rhs, and indent by some standard amount (not
+	depending on the width of the lhs).
+
+There are two main styles of safe layout, depending on whether you  take
+the  newline  before  or  after the `=' of the definition.  Here are two
+possible safe layouts for the `hippo' definition
+
+	hippo = 
+	    (rhino - swan)/piglet
+	    _w_h_e_r_e
+	    piglet = 17
+	    rhino = 63
+	    swan = 29
+
+	hippo 
+	  = (rhino - swan)/piglet
+	    _w_h_e_r_e
+	    piglet = 17
+	    rhino = 63
+	    swan = 29
+
+The reason that either style can be  used  is  that  the  boundary,  for
+offside  purposes,  of  a right hand side, is set by the first symbol of
+the rhs itself, and not by the preceding `=' sign.
+
+Both of these layouts  have  the  property  that  the  parse  cannot  be
+affected  by  edits  which alter the lengths of one or more identifiers.
+Either of these layout styles also have the  advantage  that  successive
+levels of indentation can move to the right by a fixed step - this makes
+code easier to read and lessens the danger that your layout  will  `fall
+off'  the  right  hand  edge  of  the screen (although if you follow the
+advice given earlier about avoiding deeply nested block  structure  this
+is in any case unlikely to be a problem).
+
+It would be convenient if there was a program for  reformatting  Miranda
+scripts with a standard layout.  Apart from ensuring that the layout was
+`safe' in the above sense, it might make it easier for  people  to  read
+each  other's  code.   A  layout program of this kind may be provided in
+later releases of the system.
+
+Acknowledgement: The `hippopotamus' example (and the problem  of  unsafe
+layout) was first pointed out by Mark Longley of the University of Kent.
+
+_W_r_i_t_e_ _o_r_d_e_r_ _i_n_d_e_p_e_n_d_e_n_t_ _c_o_d_e
+ When defining functions by pattern matching it is best (except in a few
+cases  where it leads to real clumsiness of expression) to make sure the
+patterns are mutually exclusive, so it does not matter in what order the
+cases are written.
+
+For the same reason it is better style to use sets of guards  which  are
+composed   of  mutually  exclusive  boolean  expressions.   The  keyword
+`otherwise' sometimes helps to make this less painful.
+
+By way of illustration of some of the issues here is a definition  of  a
+function  `merge'  which combines two already sorted lists into a single
+sorted result, eliminating duplicates in the process
+	merge [] y = y
+	merge (a:x) [] = (a:x)
+	merge (a:x) (b:y)
+	  =  a:merge x (b:y), if a<b
+	  =  b:merge (a:x) y, if a>b
+	  =  a:merge x y,     otherwise
+
+Note the use of mutually exclusive sets of patterns (it was tempting  to
+write  `merge  x  []  = x' as the second case, but the above is probably
+better style).
+
+A related issue to these is that where  a  function  is  not  everywhere
+defined  on its argument type, it is good practice to insert an explicit
+error  case.   For  example  the  definition  given  in   the   standard
+environment for `hd', the function which extracts the first element of a
+list, is
+	hd (a:x) = a
+	hd [] = error "hd []"
+
+Of course if a function is applied to an argument for which no  equation
+has  been  given, the Miranda system will print an error message anyway,
+but one advantage of putting in an explicit call to `error' is that  the
+programmer  gets  control  of the error message.  The other (and perhaps
+main) advantage  is  that  for  someone  else  reading  the  script,  it
+explicitly  documents  the  fact  that  a certain use of the function is
+considered an error.
+

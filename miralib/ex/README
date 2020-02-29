@@ -1,0 +1,54 @@
+This directory contains a (fairly random) collection of  simple  scripts
+written in Miranda.  To try one out (eg fibs.m) say
+	mira fibs
+as a UNIX command - or if you are already inside a Miranda session, say
+	/f fibs
+to  make (e.g.) fibs.m your current script.  To get into this directory,
+while in a Miranda session, say
+	/cd <ex>
+
+Each script has some explanatory comments in it.  To  read  the  current
+script from within a Miranda session say
+	/e
+which  invokes the editor on the current script.  The scripts are listed
+in groups, with some more advanced examples towards the end.   The  ones
+marked (*) may be useful as libraries.
+
+ack.m         the ackermann function
+divmodtest.m  tests properties of div and mod
+fibs.m        tabulates fibonacci numbers
+hanoi.m       solves the problem `towers of hanoi'
+powers.m      prints a table of powers
+primes.m      infinite list of prime numbers
+pyths.m       generates pythagorean triangles
+
+hamming.m     prints hamming numbers
+queens.m      all solutions to the eight queens problem
+queens1.m     finds one solution to the eight queens problem
+quicksort.m   Miranda definition of quicksort
+selflines.m   curiosity - a self describing scroll of lines
+stack.m       defines stack as an abstract data type
+treesort.m    Miranda definition of treesort
+
+parafs.m      Enumerates isomers of alkanes in pictorial form
+graphics.m    Rectangular graphics package used by parafs.m
+keith.m	      Checks that floating point overflow is trapped
+barry.m       Math calculations that stress the garbage collector
+bigscript.m   Tests gc during compilation
+makebig.m     Creates bigscript.m of any chosen size
+
+edigits.m     infinite decimal expansion of the digits of `e' (literate script)
+rational.m    package for doing rational arithmetic (*)
+refoliate.m   a tree problem (literate script)
+topsort.m     topological sort
+matrix.m      matrix package (*)
+set.m         defines set as an abstract data type (*)
+kate.lit.m    a Miranda script that is also a LaTeX source file
+
+genmat.m      parameterised version of matrix package (*)
+just.m        text formatting program
+mrev          (executable) Miranda version of the UNIX `rev' command
+box.m         (executable) program for reboxing Miranda comments
+box           symbolic link to box.m
+polish.m      testbed for unify.m
+unify.m       package for doing 1st order unification (*)

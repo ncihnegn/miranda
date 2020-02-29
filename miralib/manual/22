@@ -1,0 +1,35 @@
+_E_m_p_t_y_ _t_y_p_e_s (also called _P_l_a_c_e_h_o_l_d_e_r_ _t_y_p_e_s)
+
+An empty type has no values belonging to it (apart  from  the  undefined
+value,  undef,  which  is  a  member  of  every  type).  Empty types are
+declared as follows:
+
+	widget :: _t_y_p_e
+
+this declares `widget' to be a type but gives it no values.
+
+Empty types can be used during program development as  placeholders  for
+types  whose  representation  is not yet decided.  For example given the
+above declaration we can give type specifications involving widget, e.g.
+
+	foo :: num->widget->widget
+	gronk :: [widget]->widget
+
+and write code using `foo' and `gronk' which can  be  checked  for  type
+correctness.   At  a later stage the specification of widget as an empty
+type can be replaced by a non-empty type definition, using ==,  ::=,  or
+_a_b_s_t_y_p_e, allowing foo, gronk, to be defined.
+
+Typenames declared as empty can have any arity, eg
+	table * ** :: _t_y_p_e
+This creates a family of empty types, such as `table num  bool'  and  so
+on.  They are all devoid of values (apart from undef).  The general form
+of this kind of specification is
+	tform-list :: _t_y_p_e
+where `tform' consists of a typename followed by zero  or  more  generic
+type  variables  (and  it  is  permitted  to  declare several such types
+simultaneously, separated by commas, whence `tform-list').
+
+An empty type may be considered equivalent to an algebraic type with  no
+constructors.
+

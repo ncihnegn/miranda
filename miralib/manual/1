@@ -1,0 +1,76 @@
+_H_o_w_ _t_o_ _u_s_e_ _t_h_e_ _M_i_r_a_n_d_a_ _o_n_-_l_i_n_e_ _r_e_f_e_r_e_n_c_e_ _m_a_n_u_a_l:
+
+The manual is menu driven, and is  a  separate  subsystem  that  can  be
+invoked from the Miranda command interpreter.  To access the manual from
+Miranda, type
+        /man
+followed by return.  To access the  manual  directly  from  the  command
+line, without entering Miranda first, type the line
+	mira -man
+as a shell command.
+
+On entering the manual system  a  contents  page  is  displayed  listing
+numbered  sections.   In  response  to the question at the bottom of the
+page you should enter the number of the section  you  wish  to  see  and
+press  return  (i.e.   ENTER).   The  contents  of that section are then
+displayed to you.  When you are ready to leave the manual, press return,
+without  giving  ay  section  number, in response to the question at the
+foot of the contents page - typing q (for "quit") has the same effect.
+
+If the section is more than one page long, you should  press  the  space
+bar when you have finished reading a page, in order to see the next page
+(or press return to see one more line).  At the end of the section,  you
+may press return to go back to the contents page.
+
+The manual is organised in short sections, each at  most  two  or  three
+screenfulls long.  Where a section would otherwise be too long to fit in
+with this philosophy, the  manual  is  organised  recursively  and  will
+display a subsidiary contents page, with a list of numbered subsections,
+which you may read, as before, by typing  the  appropriate  number.   To
+return  to  the  main  menu from a submenu, press return with no section
+number, in response to the question at the bottom of the page.
+
+The manual is intended to provide online documentation  of  the  Miranda
+programming language and the command system in which it is embedded.  It
+is not intended to be a tutorial on functional programming.  It does not
+provide  information  about  the  operating  system,  for which separate
+documentation is available (but there is a section on  the  Miranda/UNIX
+interface).
+
+------------------------------------------------------------------------
+_S_u_m_m_a_r_y_ _o_f_ _m_a_n_u_a_l_ _b_e_h_a_v_i_o_u_r_:
+
+Whenever the manual system prompts the user for input -  by  asking  for
+"next selection" - the complete repertoire of possible responses is:
+
+q 	   quit the manual
+<return>   exit one level of menu structure
+		(i.e. if at foot of section, return to menu
+		      if at submenu, return to master menu
+		      if at main menu, quit the manual)
+<number>   display section from current contents page
+.  	   (dot) same again, i.e. redisplay last requested section 
++  	   display next section in numerical order
+-          display previous section
+!command   temporary escape to O/S, executes shell command
+
+------------------------------------------------------------------------
+_S_u_m_m_a_r_y_ _o_f_ _t_h_e_ _b_e_h_a_v_i_o_u_r_ _o_f_ _`_m_o_r_e_'_:
+
+Individual sections of the manual are displayed to you  using  the  UNIX
+program  `more'  or an equivalent such as `less' (you can change this by
+setting an environment variable VIEWER (*)).  These programs have  their
+own  UNIX  manual page describing their features.  The responses you can
+give generally include
+
+[SPACE]	   display next screenful
+[return]   display one more line
+q          (quit) cease showing me this file
+b          (back) scroll backwards by one screenful
+/context   search for context (eg a word)
+?context   search backwards for context
+h          help
+
+(*) See the section on Environment Variables under  UNIX/Miranda  system
+interface.
+

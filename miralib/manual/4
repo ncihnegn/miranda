@@ -1,0 +1,147 @@
+_T_h_e_ _M_i_r_a_n_d_a_ _c_o_m_m_a_n_d_ _i_n_t_e_r_p_r_e_t_e_r
+
+The Miranda system is invoked from unix by the command
+        mira [script]
+where `script' (optional parameter) is the pathname of a file containing
+a  set of Miranda definitions.  If no script is specified a default name
+`script.m' is assumed.  The named script (script.m by  default)  becomes
+your _c_u_r_r_e_n_t _s_c_r_i_p_t, during the ensuing Miranda session.  You can change
+your "current script" during a session, but  at  any  time  there  is  a
+unique filename which is current.
+
+Note that a file containing a Miranda script is expected to have a  name
+ending  in  `.m'  and  the  `mira'  command  will  add this extension if
+missing.  So `mira stuff' will be interpreted as `mira stuff.m'.  It  is
+a  convenient  and  widely used convention that files containing program
+sources should have names indicating which language they are written in.
+
+The set of names in scope at any time are those of the  current  script,
+together  with the names of any scripts which it `includes' (see library
+directives) plus the names of the _s_t_a_n_d_a_r_d _e_n_v_i_r_o_n_m_e_n_t, which is  always
+in  scope.   The  current script may be an empty or non-existent file if
+you have not yet put any definitions in it.  In this case just the names
+of the standard environment will be in scope.
+
+The prompt `Miranda' indicates that  you  are  talking  to  the  Miranda
+interpreter.   This  activity  is  called  a  Miranda ``session''.  Each
+command should be typed on a single line, following the prompt,  and  is
+entered  by  hitting  return.  Any command not beginning with one of the
+special characters `/', `?', or `!' is assumed to be an expression to be
+evaluated.  The following commands are available during a session.
+
+exp
+ Any Miranda expression typed on a line by itself is evaluated, and  the
+value  is  printed  on the screen.  If the value is of type [char] it is
+printed literally, otherwise the special function `_s_h_o_w' is  applied  to
+it to convert it to printable form.  Example
+  Miranda sum[1..100]
+  5050 (response)
+
+There  is a special symbol $$ which is always set to the last expression
+evaluated.  So after the above command $$ will have the value 5050,  and
+this  can  be used in the next expression - e.g. `$$/2' will produce the
+response 2525 (and the value of `$$' is now 2525).
+
+exp &> pathname
+ A background process is set up  to  evaluate  exp,  and  the  resulting
+output (including error messages, if any) sent to the designated file.
+
+exp &>> pathname
+ As  above,  except  that the output is appended to the designated file,
+instead of replacing its previous contents.
+
+exp ::
+ Print the type of the expression (instead of the  value).   Useful  for
+investigating the type structure of a script.
+
+?
+ Lists  all  identifiers  currently in scope, grouped by file of origin,
+starting with the standard environment.
+
+?identifier(s)
+ Gives more information about any  identifier  defined  in  the  current
+environment  (namely  its  type  and the name of the file in which it is
+defined).   This  command  will  also  accept  a  list  of  identifiers,
+separated by spaces.
+
+??identifier
+ Opens the relevant source file at the definition of  identifier,  which
+may be any currently in scope.  Try for example ??map
+ For  this and several other features to work Miranda must be configured
+to use an appropriate editor - the default is vi,  but  you  can  change
+this.   See  section  31 subheading 5 of this manual ("How to change the
+default editor").
+
+!command
+ Execute any UNIX shell command.
+
+!!
+ Repeat last shell command.
+
+Note that the character `%' can be used in any Miranda session  command,
+including  a  `!'  command,  as  an abbreviation for the pathname of the
+current script.  So for example
+	!wc %
+does a word count on the current script.  (If for some reason  you  need
+to  include a literal % character in a command, you can escape it with a
+preceding backslash.)
+
+All  the  remaining  commands  begin  with  `/'.   Each of the following
+commands can be abbreviated to its first letter.
+
+/edit (also /e)
+ Edit the current script.   Calls  up  the  currently  installed  editor
+(default _v_i, to change this see remark under ?? above).  On quitting the
+editor, if changes have been made  to  any  relevant  source  file,  the
+Miranda system automatically recompiles the current script and any other
+scripts on which it depends and which have been updated.
+
+/edit pathname (also /e pathname)
+ Edit arbitrary script.  Note that the pathname should end in  `.m'  and
+that this will be added if missing.
+
+Note by the way that (on most UNIX-like systems) Miranda understands the
+commonly used `~' convention in pathnames.  That is ~/file means file in
+your home directory, and ~jack/file means file in jack's home directory.
+
+/file (also /f)
+ Print the name of file containing the current script.
+
+/file pathname (also /f pathname)
+ Change to new current  script.   Equivalent  to  quitting  the  Miranda
+system  and  reinvoking it with a new sourcefile.  Like /e, /f adds ".m"
+to the end of the filename if missing.
+
+Important special case - reselecting the current script, eg by saying
+	/f %
+forces the current script to be RECOMPILED - this is  useful  if  script
+has errors and you wish to see the error messages again.
+
+/help (also /h)
+ Display summary of main available commands.  There are a few less used
+auxiliary commands, not covered here /aux (or /a) will summarise these.
+
+/man (also /m)
+ Enter online manual system.
+
+/quit (also /q)
+ Quit the Miranda system.  Typing the end of file character  (control-D)
+also has this effect.
+
+Finally note that $- and $+ are allowed as notations  for  the  standard
+input  in  Miranda  expressions.   The  standard  input  as  a  list  of
+characters is denoted by `$-'.  As  a  simple  example,  evaluating  the
+expression
+	reverse $-
+causes  everything  typed  at the keyboard upto the next control-D to be
+echoed backwards.
+
+The notation `$+' also denotes the standard input, but as a sequence  of
+Miranda  expressions (one per line), and returns their values as a list.
+For example
+	sum $+
+reads a sequence of numeric expressions from  the  standard  input,  and
+returns the sum of their values.  See the manual section on reading with
+interpretation  (under  UNIX/Miranda  system  interface)   for   further
+information.
+

@@ -1,0 +1,68 @@
+_L_i_s_t_ _c_o_m_p_r_e_h_e_n_s_i_o_n_s
+
+	[exp | qualifiers]
+
+List of all `exp' such that `qualifiers'.  If  there  are  two  or  more
+qualifiers they are separated by semicolons.  Each qualifier is either a
+generator, of which the allowed forms are
+
+	pattern-list <-  exp		(first form)
+
+	pattern <- exp, exp ..		(second form)
+
+or else a filter, which is a boolean expression restricting the range of
+the   variables  introduced  by  preceding  generators.   The  variables
+introduced on the left of each `<-' are local to the list comprehension.
+
+Some examples
+
+	sqs = [ n*n | n<-[1..] ]
+
+	factors n = [ r | r<-[1..n div 2]; n mod r = 0 ]
+
+	knights_moves [i,j] = [ [i+a,j+b] | a,b<-[-2..2]; a^2+b^2=5 ]
+
+Notice that a list of variables on the lhs of a `<-'  is  shorthand  for
+multiple generators, e.g. `i,j<-thing' expands to `i<-thing; j<-thing'.
+
+The variables introduced by the generators come into scope from left  to
+right,  so  later  generators  can  make  use of variables introduced by
+earlier ones.  An example of this is shown by the  following  definition
+of a function for generating all the permutations of a given list.
+
+	perms [] = [[]]
+	perms  x = [ a:p | a<-x; p<-perms(x--[a]) ]
+
+The  second  form  of  generator  allows  the construction of lists from
+arbitrary recurrence relations, thus
+	x <- a, f x ..
+causes x to assume in turn the values `a', `f a',  `f(f  a)',  etc.
+
+An example of its use is in the following definition  of  the  fibonacci
+series
+
+	fibs = [ a | (a,b) <- (1,1), (b,a+b) .. ]
+
+Another  example  is  given  by the following expression which lists the
+powers of two
+
+	[ n | n <- 1, 2*n .. ]
+
+The  order  of  enumeration  of  a  list  comprehension  with   multiple
+generators  is  like  that  of  nested  for-loops,  with  the  rightmost
+generator  as  the  innermost  loop.   For  example  the  value  of  the
+comprehension [ f x y | x<-[1..4]; y<-[1..4] ] is
+
+	[ f 1 1, f 1 2, f 1 3, f 1 4, f 2 1, f 2 2, f 2 3, f 2 4,
+	  f 3 1, f 3 2, f 3 3, f 3 4, f 4 1, f 4 2, f 4 3, f 4 4 ]
+
+As a consequence of this order of enumeration of multiple generators, if
+any  generator  other  than  the  first  (leftmost)  is  infinite,  some
+combinations of values will never be reached  in  the  enumeration.   To
+overcome  this  a  second,  _d_i_a_g_o_n_a_l_i_s_i_n_g, form of list comprehension is
+provided (see separate manual section).
+
+Note that list comprehensions do NOT remove duplicates from  the  result
+list.   To  remove  duplicates  from a list, apply the standard function
+`mkset'.
+

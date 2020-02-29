@@ -1,0 +1,92 @@
+_I_n_p_u_t_ _f_r_o_m_ _U_N_I_X_ _f_i_l_e_s_ _e_t_c_.
+
+The following Miranda functions provide an interface to  the  UNIX  file
+system from within Miranda expressions:
+
+	read :: [char]->[char]
+This takes a string valued argument, which it treats as a UNIX pathname,
+and returns the contents of the file or device of that name, also  as  a
+string  (i.e.   as  a  list  of  characters).   There  is no end-of-file
+character, the termination of the file is indicated simply by the end of
+the list of characters.  The Miranda evaluation terminates with an error
+message if the file does not exist  or  the  user  does  not  have  read
+permission for it.
+
+A special case - the notation `$-' denotes the contents of the  standard
+input,  as a list of characters.  Note that multiple occurrences of `$-'
+always denote a single shared input stream.  So for example ($-  ++  $-)
+reads one lot of data from the terminal and duplicates it.
+
+(See separate subsection on Input/Output of binary data for  the  binary
+versions readb and $:-)
+
+	filemode :: [char]->[char]
+Takes   a   pathname  and  returns  a  string  representing  the  access
+permissions of the current process to the file of that name.  The string
+is  empty  if  the  file  does not exist, otherwise it is of length four
+containing, in order, the following characters - 'd' if the  file  is  a
+directory,  'r'  if it is readable, 'w' if it is writeable, 'x' if it is
+executable.  Each character not applicable is replaced by '-'.   So  for
+example   "drwx"  is  the  filemode  of  a  directory  with  all  access
+permissions, while "-rw-" is the filemode of a normal file with read and
+write but no execute permission.
+
+	getenv :: [char]->[char]
+Looks  up  the  string  associated with a given name in the current UNIX
+environment (see man (2) getenv in the UNIX manual system).  For example
+	getenv "HOME"
+returns the name of the  current  home  directory.   Returns  the  empty
+string if the given name not present in the environment.
+
+	system :: [char]->([char],[char],num)
+The effect of `system string' is that a UNIX process is  forked  off  to
+execute  `string'  as a shell command (by `/bin/sh').  The result of the
+call to `system' is a  triple  containing  the  standard  output,  error
+output,  and  exit_status, respectively, resulting from the execution of
+the UNIX command.  (The exit_status of a UNIX command is a number in the
+range  0..127,  with a non-zero exit status usually indicating some kind
+of abnormal event.) Note that inspecting the exit_status will force  the
+Miranda  process  to  wait  until the execution of the shell command has
+completed - otherwise the two processes proceed concurrently.
+
+If  the  attempt  to  set up a shell process fails, `system' returns the
+result ([],errmess,-1), where errmess is an error message.
+
+WARNING - the function `system' provides a  very  general  interface  to
+UNIX.   Obviously,  this  can  be  abused  to  cause the evaluation of a
+Miranda expression to have side effects  on  the  state  of  the  filing
+system.   It is not intended to be used in this way - `system' should be
+used only to _o_b_t_a_i_n _i_n_f_o_r_m_a_t_i_o_n about the state of the  world.   If  you
+wish  to change the state of the world, this should be done by placing a
+`System' message in your output list (see next manual section).
+
+Since reading data from the terminal would constitute a side effect, the
+background  process  created  by  `system'  comes  into  being  with its
+standard input closed.
+
+_I_m_p_l_e_m_e_n_t_a_t_i_o_n_ _R_e_s_t_r_i_c_t_i_o_n
+ `read', `filemode', `getenv', and `system' all require  their  argument
+to be at most 1024 characters long.
+
+_N_o_t_e_ _o_n_ _s_y_s_t_e_m_ _r_e_a_d_i_n_g_ _f_u_n_c_t_i_o_n_s_ _a_n_d_ _r_e_f_e_r_e_n_t_i_a_l_ _t_r_a_n_s_p_a_r_e_n_c_y
+
+Although `read', `filemode', `getenv' do not have side effects, they are
+not  referentially  transparent  because it cannot be guaranteed that an
+expression like
+	read "file"
+will return the same result if evaluated twice.  Some external event may
+have  changed  the  state of the filing system in the meantime.  Clearly
+the same  problem  applies  to  `system'  -  consider  for  example  the
+expression
+	system "date"
+which  gets  date-and-time  as  a  string.   Evaluating  this  twice  in
+succession is unlikely to produce the same result.
+
+Strictly speaking all calls to `read' and the other  functions  in  this
+section  ought to be evaluated with respect to the state-of-the-world as
+it existed  before  the  evaluation  of  the  given  Miranda  expression
+commenced.   Otherwise  referentially  transparent  behaviour  cannot be
+guaranteed.  Enforcing this would appear to require, among other things,
+taking   a   copy  of  the  whole  filing  system  before  each  Miranda
+command-level evaluation.  For obvious reasons this is not implemented.
+

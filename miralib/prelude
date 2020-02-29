@@ -1,0 +1,110 @@
+||names defined in this file are not in scope for users - they are part
+||of the internal mechanisms of the Miranda system.
+
+||the following three identifiers are "untypeable" and defined internally
+||changetype::*->**  ||primitive function, semantically equivalent to id
+||first::*->**	||gets first element of a tuple
+||rest::*->**	||gets rest of a tuple (i.e. without first component)
+
+||offside::[char] ||defined internally and used by indent, see below
+
+  diagonalise :: [[*]]->[*]  ||used by [//] comprehensions
+  diagonalise x = diag 1 x   ||when nested does "cantorian" diagonalisation
+  diag n [] = []
+  diag n x = map hd px++diag (#px+1)rest, otherwise
+	     where
+	     px = filter (~=[]) (take n x)
+	     rest = map tl px ++ drop n x
+  listdiff::[*]->[*]->[*] ||listdiff defines the action of "--"
+  listdiff x [] = x
+  listdiff x (b:y) = listdiff (remove b x) y
+  remove b [] = []
+  remove b (a:x) = x, if a=b
+                 = a:remove b x, otherwise
+  showbool::bool->[char]
+  showbool True = "True"
+  showbool False = "False"
+||shownum defined internally
+  base r x = "0", if x=0 ||base is used by charname
+           = f x, otherwise
+             where
+             f 0 = []
+             f n = f(n div r) ++ [mkdigit(n mod r)]
+  mkdigit n = decode(n + code '0'), if n<10
+            = decode(n - 10 + code 'a'), if 10<=n<36
+  showchar::char->[char]
+  showchar x = "'" ++ charname x ++ "'"
+||note - charname has the right conventions for showchar
+||i.e. ' is escaped and " is not escaped - showstring inverts this
+  charname '\\' = "\\\\"
+  charname '\''  = "\\\'"
+  charname x = [x], if 32 <= code x < 127 \/ 160 <= code x < 256
+  charname '\a' = "\\a"
+  charname '\b' = "\\b"
+  charname '\f' = "\\f"
+  charname '\n' = "\\n"
+  charname '\r' = "\\r"
+  charname '\t' = "\\t"
+  charname '\v' = "\\v"
+  charname x = "\\" ++ pad 3 (base 10 n),  if n<1000 ||H=this case only & no pad
+             = "\\x" ++ pad 4 (base 16 n), if n<=0xffff
+             = "\\X" ++ pad 6 (base 16 n), otherwise
+               where
+               n = code x
+               pad w s = rep(w-#s)'0'++s
+               rep n x = [],            if n<=0
+                       = x:rep (n-1) x, otherwise
+  showlist::(*->[char])->[*]->[char]
+  showlist f x = '[':rest
+		 where
+		 rest = "]", if x=[]
+		      = f(hd x)++foldr g "]" (tl x), otherwise
+	         g a s = ',':f a++s
+  showstring::[char]->[char]
+  showstring x = '"' : showstr x
+  showstr [] = "\""
+  showstr ('"':x) = "\\\"" ++ showstr x
+  showstr (a:x) = s ++ showstr x ||for Haskell style padding use s1 here
+                  where          ||see also line marked H above
+                  s = charname a
+||                s1 = s ++ "\\&", if clash s x
+||                   = s, otherwise
+||                clash ('\\':c:cs) (d:ds) = digit c & digit d
+||                clash s x = False
+  digit c = '0' <= c <= '9'
+  shownum1::num->[char]
+  shownum1 n = "("++shownum n++")", if n<0
+	     = shownum n, otherwise
+  showparen::(*->[char])->*->[char]
+  showparen f x = "("++f x++")"
+  showpair::(*->[char])->(**->[char])->***->[char]
+  showpair f1 f2 tup = f1(first tup)++","++f2(rest tup)
+  showvoid::()->[char]
+  showvoid () = "()"
+  showfunction::(*->**)->[char]
+  showfunction x = "<function>"
+  showabstract::*->[char]
+  showabstract x = "<abstract ob>"
+  showwhat::*->[char]
+  showwhat x = error "undeclared show-function", if x=x
+||the following function is used to implement the offside rule (under %bnf)
+  indent :: *->**->** || * is type of `col' function, ** is parser
+  outdent :: *->*     || * is a parser
+  indent = changetype indent1
+  outdent = changetype outdent1
+  indent1 col f ((a,s):x) 
+    = f ((a,s):cutoff col (col s) x), if a~=offside
+  indent1 col f x = f x
+  cutoff col n = g
+  	         where
+  	         g ((a,s):x) = (a,s):g x, if col s>=n
+                             = (offside,s):(a,s):x, otherwise
+                 g [] = []
+  outdent1 f = reconstruct.f
+  reconstruct (m:x) = m:g x
+                      where
+  		      g ((a,s):x) = x, if a=offside
+                      g (t:x) = t:g x
+  		      g [] = []
+  reconstruct fail = fail  ||internal repn of failure is a non-CONS object
+||offside is defined internally and differs from every string

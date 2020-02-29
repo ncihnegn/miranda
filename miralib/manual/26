@@ -1,0 +1,72 @@
+_M_i_r_a_n_d_a_ _l_e_x_i_c_a_l_ _s_y_n_t_a_x
+ In this section square brackets are used to enclose a  set  of  literal
+characters,  using lex-style conventions, so eg [a-z] means a lower case
+letter.   As  usual  *  and  ?   are  used  to  mean  zero-or-more,  and
+zero-or-one,  occurrences of the preceding entity.  Parentheses are used
+for grouping, and subtraction of one syntactic entity from another means
+set  difference.   We  also  revert to using `|' for alternatives, as in
+standard BNF.
+
+script:= (token | layout)*
+
+layout:= nl | tab | formfeed | space | comment
+
+comment:= vertical_bar vertical_bar (any - nl)* nl
+
+token:= identifier | IDENTIFIER | literal | typevar | delimiter
+
+identifier:= ([a-z] [a-zA-Z0-9_']* ) -  delimiter
+
+IDENTIFIER:= [A-Z] [a-zA-Z0-9_']*
+
+literal:= numeral | charconst | stringconst
+
+literal1:= literal - float
+
+numeral:= nat | float
+
+nat:= [0-9] [0-9]* | 0x [0-9a-f] [0-9a-f]* | 0o [0-7] [0-7]*
+
+float:=  [0-9]* [.] nat epart? | nat epart
+
+epart:= [e] [+|-]? nat
+
+charconst:= ['] (visible-[\]|escape) [']
+
+stringconst:= ["] (visible-[\"]|escape)* ["]
+
+escape:= [\] ([ntfrb\'"]|nl|decimal_code)
+
+typevar:= [*][*]*
+
+delimiter:= - | prefix1 | infix1 | other
+
+infix1:= ++ | -- | : | \/ | & | > | >= | = | ~= | <= | < | + | * |
+         / | div | mod | ^ | . | ! | $identifier | $IDENTIFIER
+
+infix:= infix1 | -
+
+prefix1:= ~ | #
+
+prefix:= prefix1 | -
+
+other:= abstype | if | otherwise | readvals | show | type | where |
+	with | %export | %free | %include | %insert | %list | %nolist |
+	= | == | ::= | :: | => | vertical_bar | // | -> | ; | , | ( |
+	) | [ | ] | { | } | <- | .. | $$ | $- | $:- | $+ | $*
+
+vertical_bar:= |
+
+_N_o_t_e_s
+ visible means any  non-control  character,  including  space  (but  not
+including  eg  newline), nl means literal newline, and decimal_code is a
+nat in the range 0..255 (maximum length 3 digits).
+
+Notice that the syntax of `numeral' does not include  negative  numbers.
+Negative  constants,  such  as  -3 or -5.05e-17 are parsed by Miranda as
+applications of the prefix operator `-' to a positive numeral.  This has
+no semantic significance.
+
+Omission - the definition of `layout' does not  include  the  additional
+comment rules for LITERATE SCRIPTS (see separate manual section).
+

@@ -1,0 +1,87 @@
+_B_u_g_ _R_e_p_o_r_t_s
+
+Bug reports should be sent to mira-bugs at the domain
+	miranda.org.uk
+First check below, however, in case it is already known.  Also check the
+downloads  section  at  miranda.org.uk in case there is a new version of
+Miranda in which your bug may be fixed.   When  sending  a  bug  report,
+please  state the version number of your Miranda system and the platform
+that it is running on.
+
+The error messages from the Miranda system are mostly self  explanatory.
+Note,  however,  that  messages  of  the  form "impossible event ..." or
+similar indicate that the  internal  state  of  the  system  has  become
+corrupted.   This should be reported as a bug.  Segmentation faults also
+falls into this category.
+
+First check if the problem only occurs following a  garbage  collection.
+Garbage  collector  reports  can  be  turned  on  by `mira -gc' from the
+command line or by /gc within a miranda session.   If  your  error  does
+appear to be associated with garbage collection you can try running with
+a bigger heap and/or  getting  mira  recompiled  at  a  lower  level  of
+optimisation  (eg  -O  instead  of  -O2, or without -O).  Miranda uses a
+"conservative collector" which scans the C stack to follow  things  that
+are,  or  appear  to  be, pointers into the heap.  Unfortunately this is
+vulnerable to compiler optimisations affecting the state of the stack.
+
+Even if the problem does appear to  be  gc-related  it  is  still  worth
+reporting.
+
+The source code, orginally  written  for  32  bit  platforms,  has  been
+extensively  revised  and  tested for 64 bit compatibility.  It is quite
+possible that some hidden "integer width" problems remain  in  the  code
+and will be discovered in use.
+
+_L_i_s_t_ _o_f_ _k_n_o_w_n_ _b_u_g_s_,_ _d_e_f_i_c_i_e_n_c_i_e_s_,_ _a_n_d_ _u_n_i_m_p_l_e_m_e_n_t_e_d_ _f_e_a_t_u_r_e_s
+
+If there is not enough heap to compile the current  script,  mira  exits
+after reporting this fact.  The fix is to increase the heap size:
+	mira -heap N [filename]
+where N is a bigger number than you had before.
+
+It is not currently permitted  to  give  a  type  specification  for  an
+identifier  defined  locally,  as  part of a _w_h_e_r_e clause.  That is (see
+formal syntax) `spec' is not allowed after _w_h_e_r_e.
+
+When abstract objects are tested for equality or order (under <, <= etc)
+the  result is that obtained by applying the operation to the underlying
+representation type.  In some cases this will be what you want,  but  in
+others it will be wrong - there ought to be a way of controlling this.
+
+The standard input cannot be accessed both as a list of characters (with
+$-)  and  as  a  list of values (with $+) at the same time.  If $+ is in
+use, an occurrence of $- will evaluate to [], and vice versa.   This  is
+not referentially transparent - uses of $+ and $- ought to share data.
+
+Scripts with multiple occurrences of $+  also  behave  opaquely  -  each
+occurrence  of $+ reads from the terminal independently, and they do not
+share data with each other.  (Multiple occurrences of  $+  in  a  single
+command-level expression behave transparently, however.)
+
+There is a subtle issue concerning `show' and %export.  If you define  a
+function  which, internally, uses `show' on an object of algebraic type,
+and then %export that function to another scope, the format used by  the
+`show'  depends  on  the  status of the algebraic type in the NEW scope.
+Thus if the type has been aliased the  new  constructor  names  will  be
+used,  and  if the algebraic type is no longer in scope, it will show as
+"<unprintable>" (this latter case can arise if an abstract type based on
+the  algebraic  type  is  exported, and one of the signature identifiers
+invokes  `show'  on  the  base  type).   Although  this   behaviour   is
+defensible,  it might be better for each use of `show' at algebraic type
+to be frozen to use the constructor names in the scope where it  occurs.
+[An analogous issue arises with `readvals'.]
+
+Implementation restrictions not mentioned elsewhere in  the  manual:-
+
+A shell command called from mira using `!' is limited to 1024 characters
+in  length after any implied expansions (eg of `%') have been performed.
+The same restriction applies to the  result  of  expanding  out  a  `/e'
+command.    The  pathnames  of  Miranda  scripts  are  limited  to  1024
+characters in length, including the `.m' extension.   The  name  of  the
+editor  supplied for the `/e' command, and the absolute pathnames of the
+miralib directory, and of the  user's  home  directory,  are  also  each
+limited to 1024 characters in length.
+
+The name of a Miranda script may not contain spaces (but directory names
+with spaces are allowed in pathnames).
+

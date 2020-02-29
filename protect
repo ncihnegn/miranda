@@ -1,0 +1,7 @@
+chmod -R a-w miralib
+cd miralib
+chmod a+w ex/*.x preludx stdenv.x
+chmod u+w . ex local
+
+#makes miralib files read-only except for .x files
+#to prevent users accidentally changing stdenv.m or manual pages

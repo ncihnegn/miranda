@@ -1,0 +1,58 @@
+_S_y_n_t_a_x_ _o_f_ _M_i_r_a_n_d_a_ _s_c_r_i_p_t_s_ _a_n_d_ _e_x_p_r_e_s_s_i_o_n_s
+
+script:= decl*                          rhs:= simple_rhs(;)
+                                              cases
+decl:= def
+       tdef                             simple_rhs:= exp whdefs?
+       spec
+       libdir                           cases:= alt(;) = cases
+                                                lastcase(;)
+def:= fnform = rhs
+      pat = rhs                         alt:= exp , _i_f exp
+
+tdef:= tform == type(;)                 lastcase:= lastalt whdefs?
+       tform ::= constructs(;)
+       _a_b_s_t_y_p_e tform-list _w_i_t_h sig(;)   lastalt:= exp , _i_f exp
+                                                  exp , _o_t_h_e_r_w_i_s_e
+spec:= var-list :: type(;)
+       tform-list :: _t_y_p_e(;)            whdefs:= _w_h_e_r_e def def*
+
+sig:= spec spec*                        exp:= e1
+                                              prefix1
+constructs:= construct | constructs           infix
+             construct
+                                        e1:= simple simple*
+construct:= constructor argtype*             prefix e1
+            type $constructor type           e1 infix e1
+            ( construct ) argtype*
+                                        simple:= var
+type:= argtype                                   constructor
+       typename argtype*                         literal
+       type -> type                              _r_e_a_d_v_a_l_s
+       type $typename type                       _s_h_o_w
+                                                 ( infix1 e1 )
+argtype:= typename                               ( e1 infix )
+          typevar                                ( exp-list? )
+          ( type-list? )                         [ exp-list? ]
+          [ type-list ]                          [ exp .. exp? ]
+                                                 [ exp , exp .. exp? ]
+tform:= typename typevar*                        [ exp | qualifs ]
+        typevar $typename typevar                [ exp // qualifs ]
+
+fnform:= var formal*                    qualifs:= qualifier ; qualifs
+         pat $var pat                             qualifier
+         ( fnform ) formal*
+                                        qualifier:= exp
+pat:= formal                                        generator
+      -numeral
+      constructor formal*               generator:= pat-list <- exp
+      pat : pat                                     pat <- exp , exp ..
+      pat + nat
+      pat $constructor pat              var:= identifier
+      ( pat ) formal*
+                                        constructor:= IDENTIFIER
+formal:= var
+         constructor                    typename:= identifier
+         literal1
+         ( pat-list? )
+         [ pat-list? ]

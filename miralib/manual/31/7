@@ -1,0 +1,160 @@
+_O_p_t_i_o_n_s_,_ _s_e_t_u_p_ _f_i_l_e_s_ _e_t_c_.
+
+The full form of the `mira' command is
+	mira [flags...] [script]
+this command causes a Miranda session to be entered with the given  file
+as  current  script.   If  no  script  is  specified  a default filename
+`script.m' is assumed.  The specified file need not yet exist - in  this
+case  you  will  be  starting  a  Miranda  session with an empty current
+script.
+
+Note that `.m' is the standard extension  for  Miranda  language  source
+files  - the mira command always adds the `.m' extension, if missing, to
+any filename argument denoting a Miranda script.
+
+The available options are:
+
+	-lib pathname
+Tells mira to find miralib (directory containing libraries, manual pages
+etc.) at `pathname'.  The default is to look for miralib of same version
+number as the program  at  `/usr/lib/miralib',  `/usr/local/lib/miralib'
+and  `./miralib',  in  that  order.  The -lib flag overrides the version
+number check.  The same effect is obtained  by  setting  an  environment
+variable MIRALIB, see next manual section.
+
+	-gc
+Switches on a flag causing the garbage collector  to  print  information
+each  time  a  garbage  collection  takes  place.  This flag can also be
+switched on and off from within the  miranda  session  by  the  commands
+`/gc', `/nogc'.
+
+	-count
+Switches  on  a  flag  causing  statistics  to  be  printed  after  each
+expression  evaluation.   This flag can also be switched on and off from
+within the miranda session by the commands `/count', `/nocount'.
+
+	-list
+	-nolist
+Switches on (off) a flag causing Miranda scripts to  be  listed  to  the
+screen  during  compilation.   This flag can also be switched on and off
+from within the miranda session by the commands `/list', `/nolist'.
+
+	-nostrictif
+Enables  the  compiler  to  accept  old  Miranda  scripts  with  missing
+occurrences  of the keyword `if' in guard syntax.  Probably obsolete but
+retained just in case someone needs it.
+
+	-hush
+	-nohush
+The  miranda  system  decides  whether  or not to give prompts and other
+feedback by testing its standard input with `isatty'.  If  the  standard
+input  does not appear to be a terminal it assumes that prompts would be
+inappropriate, otherwise it gives them.  In either case  this  behaviour
+can be overriden by an explicit flag ("-hush" for silence, "-nohush" for
+prompts etc).  This switch is  also  available  from  within  a  miranda
+session by the commands `/hush', `/nohush'.
+
+	-dic SIZE
+Causes  the  dictionary (used by the compiler to store identifiers etc.)
+to be set up with SIZE bytes instead of the default 24kb.
+
+	-heap SIZE
+Causes the heap to be set up with SIZE  cells  instead  of  the  default
+(currently 100k).  This can also be done from within the miranda session
+by the command `/heap SIZE'.  A cell currently occupies 9 bytes.
+
+	-editor name
+Causes the resident  editor  (initially  `vi',  unless  the  environment
+variable  EDITOR  was set to something else) to be `name' instead.  This
+can also be done from within the miranda session by the command `/editor
+name'.
+
+	-UTF-8
+	-noUTF-8
+Assume the current locale is (is not) UTF-8 overriding environment vars
+(version 2.044 and later).
+
+	-stdenv
+Run mira without loading the standard environment.   Every  script  that
+needs  functions  from the standard environment will then have to either
+explicitly %include  <stdenv>  or  define  the  required  functions  for
+itself.  Not recommended as normal practice since it may have unexpected
+consequences (for example I/O will be limited by  the  absence  of  type
+sys-message).
+
+	-object
+Used for debugging the compiler.  Modifies behaviour  of  ?identifier(s)
+to  show  the  associated  combinator  code,  which  may  or  may not be
+comprehensible as there is no documentation other than the source code.
+
+_S_P_E_C_I_A_L_ _C_A_L_L_S
+ In addition the following special calls to `mira' are  available  which
+do  not  enter  a  Miranda  session  but  accomplish another purpose, as
+described below.
+
+	mira -man
+To enter the miranda online manual system directly from the UNIX shell.
+
+	mira -exp
+Special call permitting the use of miranda script as a stand-alone  UNIX
+command.  See separate manual page for details.
+
+	mira -log
+Same as -exp except that it redirects stderr to a file  log/mira.errors,
+if  log  directory  exists  in  the current directory and mira has write
+permission to it.
+
+	mira -make [sourcefiles]
+Forces  a check that all the miranda source files listed have up-to-date
+object code files, triggering compilation processes  if  necessary  (see
+manual subsection on the library mechanism: separate compilation).
+
+	mira -exports [sourcefiles]
+Sends  to  stdout  a  list  of  the  identifiers  exported  (see  manual
+subsection  on library mechanism: separate compilation) from each of the
+given miranda source files, together with their types  (may  also  force
+recompilation if needed).
+
+	mira -sources [sourcefiles]
+Sends to stdout a list of all the Miranda  source  files  on  which  the
+given  source  files  directly  or  indirectly  depend  (via %include or
+%insert statements), excluding the standard environment <stdenv>.
+
+	mira -version
+Gives version information.  This information can also be  obtained  from
+within a Miranda session by the command `/version'.
+
+	mira -V
+More detailed version information.
+
+_S_E_T_U_P_ _F_I_L_E_S
+
+The current settings of _d_i_c, _h_e_a_p and  _e_d_i_t_o_r  are  saved  in  the  file
+`.mirarc'  in  the users home directory, and are thereby carried over to
+the next miranda session.  The  settings  of  the  compiler  flag  which
+controls   whether  or  not  source  is  listed  to  the  screen  during
+compilation (toggled by the commands  _/_l_i_s_t  _/_n_o_l_i_s_t  during  a  Miranda
+session)  and  of  the flag which controls the frequency of checking for
+source updates (toggled by the commands /recheck  /norecheck)  are  also
+saved in the users `.mirarc' file.
+
+The default settings of these entities, which will be picked up  by  new
+users  executing  `mira' for the first time, are dic 24000 (bytes), heap
+100000 (9-byte  cells),  editor  _v_i,  nolist,  norecheck.   The  current
+settings  can  be  interrogated  from  a  Miranda session by the command
+`/settings' or `/s'.
+
+The defaults can be changed, on a system wide basis, by moving a copy of
+a  `.mirarc'  file  containing  the  desired settings into the `miralib'
+directory  (normally  found  at  /usr/lib/miralib).   The  user's  local
+.mirarc  file,  once  created in his home directory by the first call to
+mira, will override the global one, however.
+
+The behaviour of the `mira' program is also sensitive to the settings of
+certain environment variables - see separate manual entry about this.
+
+_O_U_T_P_U_T_ _B_U_F_F_E_R_I_N_G
+ Output from the Miranda system to the user's  terminal  should  not  be
+line buffered, or some things will not work as they are intended.  There
+is no problem about input being line buffered, however.
+

@@ -1,0 +1,75 @@
+_O_p_e_r_a_t_o_r_s_ _a_n_d_ _t_h_e_i_r_ _b_i_n_d_i_n_g_ _p_o_w_e_r_s
+
+Here is a list of all prefix and infix operators, in order of increasing
+binding power.  Operators given on the same line are of the same binding
+power.  Prefix operators are identified as such in the  comments  -  all
+others are infix.
+
+ operator 			comments
+
+ : ++ -- 			right associative
+ \/ 				associative
+ & 				associative
+ ~ 				prefix
+ > >= = ~= <= < 		continued relations allowed, eg 0<x<=10
+ + - 				left associative
+ - 				prefix
+ * / _d_i_v _m_o_d 			left associative
+ ^ 				right associative
+ .  				associative
+ # 				prefix
+ !  				left associative
+ $identifier $IDENTIFIER	right associative
+
+Brief explanation of each operator:
+:	prefix an element to a list, type *->[*]->[*]
+++ --   list concatenation, list subtraction, both of type [*]->[*]->[*]
+        A formal definition of list subtraction is given below.
+\/  &   logical `or', `and', both of type bool->bool->bool
+~       logical negation, type bool->bool
+> >= = ~= <= <
+	comparison operators, all of type *->*->bool
+	Note that there is an ordering defined on every (non-function)
+	type.  In the case of numbers, characters and strings the order
+	is as you would expect, on other types it as an arbitrary but
+	reproducible ordering.  Equality on structured data is a test 
+	for isomorphism.  (i.e. in LISP terms it is "EQUAL" not "EQ").
+	It is an error to test functions for equality or order.
++ -     plus, minus, type num->num->num
+-       unary minus, type num->num
+	Note that in Miranda unary minus binds less tightly than
+	the multiplication and division operators.  This is the
+	usual algebraic convention, but is different from PASCAL.
+* / _d_i_v _m_o_d
+	times, divide, integer divide, integer remainder, 
+	all of type num->num->num
+	`/' can be applied to integers or fractional numbers, and
+	always gives a fractional result, so eg 6/2 is 3.0
+	_d_i_v and _m_o_d can only be applied to integers and
+	give integer results, eg 7 div 2 is 3, 7 mod 2 is 1.
+	_d_i_v and _m_o_d obey the following laws, for a b any integers
+	with b ~= 0
+	(i)  b * (a _d_i_v b) + a _m_o_d b  =  a
+	(ii) if b>0 then 0 <= a _m_o_d b < b
+	     if b<0 then b < a _m_o_d b <= 0
+^       `to the power of', type num->num->num
+.       function composition, type (**->***)->(*->**)->*->***
+#       length of list, type [*]->num
+!       list subscripting, type [*]->num->*
+        note that the first element of a non-empty list x is x!0 and the
+	last element is x!(#x-1)
+$identifier $IDENTIFIER
+	do-it-yourself infix, `a $f b' is equivalent in all contexts to
+	`f a b'.  Also works for constructors of two or more arguments.
+
+_N_o_t_e_ _o_n_ _l_i_s_t_ _s_u_b_t_r_a_c_t_i_o_n
+ Here is a formal definition of the `--' operator  in  Miranda.   It  is
+defined  using  an  auxiliary  function `remove' which removes the first
+occurrence (if any) of a given item from a list.
+
+	x -- [] = x
+	x -- (b:y) = (remove b x) -- y
+	remove b [] = []
+	remove b (a:x) = x,            if a=b
+		       = a:remove b x, otherwise
+

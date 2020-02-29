@@ -1,0 +1,28 @@
+LIST OF REMAINING COMMANDS:
+
+/aux  /a          print this list of auxiliary commands
+/cd [dirname]     change directory (defaults to home directory)
+/count (/nocount) statistics following each evaluation (default off)
+/dic              report size of dictionary for storing names etc
+/editor           report name of text editor used by ?? and /e commands
+/editor PROG     *change resident editor to PROG (see below)
+/find id(s)       like `?ids' but look under original names of aliases
+/gc (/nogc)       enable garbage collection reports (default off)
+/heap             report size of heap
+/heap SIZE        set heap to SIZE cells
+/hush (/nohush)   control prompts and other feedback (default on)
+/list (/nolist)  *control listing of script when compiling (default off)
+/miralib          report absolute pathname of the directory miralib
+/(no)recheck     *control busy checking for script updates (default off)
+/settings  /s     print current settings of controllable options
+/version  /v      print version information
+/V                more detailed version information
+||...             lines beginning in `||' are ignored (comment facility)
+
+notes:-
+commands marked (*) are sticky, i.e. remembered for subsequent sessions
+if you don't like the resident editor choose another - recommended editors
+include - vi, joe, pico, nano, emacs - for more info see /man section 31(5)
+/recheck enables a check for update of any relevant source file before
+each evaluation, instead of only after /e[dit] - appropriate if an
+editor window is kept open alongside the mira session window.

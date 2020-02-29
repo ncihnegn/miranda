@@ -1,0 +1,114 @@
+_B_a_s_i_c_ _t_y_p_e_ _s_t_r_u_c_t_u_r_e_ _a_n_d_ _n_o_t_a_t_i_o_n_ _f_o_r_ _t_y_p_e_s
+
+The Miranda programming language  is  _s_t_r_o_n_g_l_y  _t_y_p_e_d  -  that  is  each
+expression  and each variable has a type that can be deduced by a static
+analysis of the program text.
+
+_P_r_i_m_i_t_i_v_e_ _t_y_p_e_s
+ num bool char
+
+Values of type `num' include both integer and  floating  point  numbers,
+e.g.
+	23     0   -17   1.26e11
+They  are  stored  using  different internal representations, but can be
+freely mixed in calculations, and  are  both  of  type  `num'  for  type
+checking  purposes.   There  is  automatic  conversion  from  integer to
+floating point when required (but not in the opposite  direction  -  use
+`entier', see standard environment).  Floating point numbers are held to
+double precision, integers to unbounded precision.
+
+The values of type `bool' are the two truth values:
+	True    False
+
+The values of type `char' are characters in the Latin-1  character  set,
+e.g.
+	'a'    '%'    '\t'
+
+_L_i_s_t_ _t_y_p_e_s
+ [t] is the type of lists whose elements are of type `t'
+
+Thus [num] is the type of lists of numbers such as [1,2,3,4,5]
+
+[[num]] is the type of lists of lists of numbers, such as [[1,2],[3,4]]
+
+[char] are lists of characters  -  this  is  also  the  type  of  string
+constants, so e.g. ['h','e','l','l','o'] and "hello" are interchangeable
+objects of this type.
+
+_T_u_p_l_e_ _t_y_p_e_s
+ (t1,...,tn) is the type of a tuple with elements of type `t1' to `tn'
+
+Example - the value (1,True,"red") is of type (num,bool,[char])
+
+The type of the empty tuple, `()', is also  written  `()'.
+
+Notice  that  tuples  are  distinguished from lists by being enclosed in
+parentheses, instead of square brackets.
+
+There is no concept of a 1-tuple, in Miranda, so the use of  parentheses
+to  enclose  subexpressions,  as  in say a*(b+c), does not conflict with
+their use for tuple formation.
+
+_F_u_n_c_t_i_o_n_ _t_y_p_e_s
+ t1->t2 is the type of a function with argument  type  `t1'  and  result
+type `t2'
+
+The '->' is right associative, so e.g.  `num->num->num' is the type of a
+curried function of two numeric arguments.
+
+In addition to the built-in types described above,  user  defined  types
+may  be  introduced - these are of three kinds, synonym types, algebraic
+types and abstract types - see separate manual entry for each.
+
+_I_m_p_l_i_c_i_t_ _t_y_p_i_n_g
+ In Miranda the types of identifiers do NOT normally need to be declared
+explicitly  - the compiler is able to infer the type of identifiers from
+their defining equations.  For example if you write
+	plural x = x ++ "s"
+
+the compiler will DEDUCE that `plural' is of type [char]->[char].  It is
+however permitted to include explicit type declarations in the script if
+desired, e.g.  you could write (anywhere in the same script)
+	plural :: [char]->[char]
+
+and the compiler will check  this  for  consistency  with  the  defining
+equation  (the symbol `::' means `is of type').  More generally the type
+declared may be an _i_n_s_t_a_n_c_e (see below)  of  the  type  implied  by  the
+definition  -  in this case the effect of the declaration is to restrict
+the type of the identifier to be less general than  it  would  otherwise
+have been.
+
+Note  that  only  top-level  identifiers  may  be  the  subject  of type
+declarations, and that the type of an identifier may be declared at most
+once in a given script.
+
+
+_P_o_l_y_m_o_r_p_h_i_s_m
+ The  final  feature  of  the type system is that it permits polymorphic
+types.  There is an alphabet of generic type variables, written
+	*    **    ***    etc.
+
+each of which stands for an arbitrary type.  We give a simple example  -
+the identity function, which may be defined
+	id x = x
+
+is attributed the type `*->*'.  This means that `id' has  many  types  -
+`num->num', `char->char', `[[bool]]->[[bool]]' and so on - each of these
+is an instance of its most general type, `*->*'.
+
+Another simple example  of  polymorphism  is  the  function  `map'  (see
+standard  environment)  which  applies  a function to every element of a
+list.  For example `map integer [1,1.5,2]'  is  [True,False,True].   The
+type of map is
+	map :: (*->**) -> [*] -> [**]
+
+The most polymorphic possible object is `undef',  the  identifier  which
+stands  for  the  undefined,  or  error  value  (undef is defined in the
+standard environment).  Since every type has  an  undefined  value,  the
+correct type specification for undef is
+	undef :: *
+
+Many of the functions in the standard environment have polymorphic types
+- the text of the standard environment (see separate  manual  entry)  is
+therefore a useful source of examples.
+

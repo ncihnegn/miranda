@@ -1,0 +1,5 @@
+#! /bin/sh
+echo a listing of the manual is being put in the file
+echo "mira.man" in your home directory ...
+echo
+./printman > $HOME/mira.man

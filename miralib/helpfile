@@ -1,0 +1,25 @@
+SUMMARY OF MAIN AVAILABLE COMMANDS:
+
+exp             evaluate a Miranda expression
+exp &> file     send value of expression to file (background process)
+exp &>> file    append value of expression to file (background process)
+exp ::          print type of exp
+?               list all identifiers in scope (grouped by source file)
+?identifier(s)  give more information about identifier(s)
+??identifier    open source file at definition of identifier
+!command        execute any UNIX shell command
+!!              repeat last shell command
+/edit /e        edit current script (default editor = vi or joe)
+/edit filename  edit filename
+/file /f        display filename of current script
+/file filename  change to new current script
+/help /h        display this command summary
+/man /m         ENTER ONLINE REFERENCE MANUAL (menu driven)
+/quit /q        quit the Miranda system
+/aux /a         display list of auxiliary commands
+
+Notes:-
+each "/" command can be abbreviated to its first letter - /e /f /h /m /q
+% is shorthand for the name of the current script (in commands)
+Special case - note that `/f %' forces recompilation of current script
+$$ is shorthand for the last expression evaluated (in expressions)

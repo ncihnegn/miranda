@@ -1,0 +1,38 @@
+_H_o_w_ _t_o_ _a_l_t_e_r_ _t_h_e_ _s_i_z_e_s_ _o_f_ _w_o_r_k_s_p_a_c_e_s
+
+The Miranda system uses two main internal workspaces called  "heap"  and
+"dic".   If  either overflows during a session, a self explanatory error
+message is given.  The sizes of both areas may changed by  the  user  if
+required.   Any  change made is remembered thereafter and for subsequent
+sessions until countermanded.
+
+The heap contains almost all the data structures  created  both  by  the
+Miranda  compiler and the evaluation system.  To compile and/or run very
+large scripts you may need a bigger heap.   To  find  out  (change)  the
+current size of the heap say
+	/heap		(or /heap newsize  e.g.   /heap 2000000 )
+
+The heap size may also be altered by using  a  flag  (see  below).   You
+should  be  aware  that running Miranda processes with a very large heap
+may give you slower responses.
+
+The dictionary is used to  store  identifiers  and  file  names  by  the
+Miranda  compiler.  It is unlikely that you will need to change the size
+of  the  dictionary.   The  current  size  of  the  dictionary  can   be
+ascertained by the command
+	/dic
+
+it  cannot  be  changed dynamically, from within the Miranda system.  To
+alter the dictionary size use a flag (see next para).
+
+The sizes of either or both areas may be set by flags when invoking  the
+miranda system.  The following shows both possibilities
+	mira -dic 80000 -heap 2000000 [script]
+
+Note that the size of the heap is given in `cells' (a cell is  9  bytes,
+currently) and the size of the dictionary is in bytes.
+
+The  most  recent settings of the workspace sizes are stored in the file
+".mirarc" in the users home directory, and automatically carried over to
+the next miranda session.
+

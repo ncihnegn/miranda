@@ -1,0 +1,33 @@
+_D_i_a_g_o_n_a_l_i_s_i_n_g_ _l_i_s_t_ _c_o_m_p_r_e_h_e_n_s_i_o_n_s
+
+	[ exp // qualifiers ]
+
+Syntax and scope rules exactly as for standard list comprehensions,  the
+only difference being the use of `//' in place of the vertical bar.  The
+order of enumeration of the generators is such  that  it  is  guaranteed
+that  every  possible  combination of values will be reached eventually.
+The diagonalisation algorithm used is "fair" in the sense that it  gives
+equal priority to all of the generators.
+
+For example the value of [f x y//x<-[1..4]; y<-[1..4]] is
+
+	[ f 1 1, f 1 2, f 2 1, f 1 3, f 2 2, f 3 1, f 1 4, f 2 3,
+	  f 3 2, f 4 1, f 2 4, f 3 3, f 4 2, f 3 4, f 4 3, f 4 4 ]
+
+The algorithm used used is "Cantorian  diagonalisation"  -  imagine  the
+possible  combinations  of  values from the two generators laid out in a
+(perhaps infinite) rectangular array, and traverse each diagonal in turn
+starting  from  the origin.  The appropriate higher-dimensional analogue
+of this algorithm is used for the case  of  a  list  comprehension  with
+three or more generators.
+
+As an example of an enumeration that could not be defined at all using a
+standard list comprehension, because of the presence of several infinite
+generators, here  is  a  definition  of  the  list  of  all  pythagorean
+triangles (right-angled triangles with integer sides)
+
+	pyths = [(a,b,c)//a,b,c<-[1..];a^2+b^2=c^2]
+
+In the case that there is only one generator, the use of `//' instead of
+`|' makes no difference to the meaning of the list comprehension.
+

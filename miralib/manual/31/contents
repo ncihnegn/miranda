@@ -1,0 +1,12 @@
+_U_N_I_X_/_M_i_r_a_n_d_a_ _s_y_s_t_e_m_ _i_n_t_e_r_f_a_c_e_ _i_n_f_o_r_m_a_t_i_o_n
+
+ 1. Input from UNIX files etc
+ 2. Output to UNIX files etc
+ 3. Reading with interpretation (`_r_e_a_d_v_a_l_s' and $+)
+ 4. Using Miranda to build UNIX commands
+ 5. How to change the default editor
+ 6. How to alter sizes of workspaces
+ 7. Options, setup files etc
+ 8. Environment variables used by Miranda
+ 9. Input/Output of binary data
+

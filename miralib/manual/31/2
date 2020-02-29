@@ -1,0 +1,138 @@
+_O_u_t_p_u_t_ _t_o_ _U_N_I_X_ _f_i_l_e_s_ _e_t_c_.
+
+Since Miranda is a functional language, the evaluation of an  expression
+cannot  in  itself  cause  a side effect on the state of the world.  The
+side effects occur when the value of the  expression  is  printed.   The
+value  of  a  command  level  expression is a list of `system messages',
+where the possible forms of message are  shown  by  the  following  type
+declaration,
+
+  sys_message ::= Stdout [char] | Stderr [char] | Tofile [char] [char] |
+                  Closefile [char] | Appendfile [char] | System [char] |
+                  Exit num |  Stdoutb [char] |  Tofileb [char] [char]  |
+                  Appendfileb [char]
+
+The  system `prints' such a list of messages by reading it in order from
+left to right, evaluating and obeying each message  in  turn  as  it  is
+encountered.  The effect of the various messages is as follows.
+
+	Stdout string
+The  list  of characters `string' is transmitted to the standard output,
+which will normally be connected to the user's screen.  So  for  example
+the effect of obeying
+	[Stdout "!!!"]
+is that three exclamation marks appear on the screen.
+
+	Stderr string
+The  list  of  characters `string' is sent to the standard error output.
+[Explanation to those unfamiliar with UNIX stream philosophy: all normal
+UNIX processes come into existence with a standard input stream, and two
+output streams, called standard out  and  standard  error  respectively.
+Under  normal  circumstances  standard  error  and standard out are both
+connected to the users screen, but in principle they could be  connected
+to different places.]
+
+	Tofile fil string
+The characters of the string are transmitted to the file or device whose
+UNIX pathname is given by `fil'.  Successive `Tofile'  messages  to  the
+same  destination  are  appended  together  (i.e. the first such message
+causes the file to be opened for writing, and it remains open until  the
+end  of  the  whole  message list).  Note that opening a file for output
+destroys its previous  contents  (unless  preceded  by  an  `Appendfile'
+message, see below).
+
+	Closefile fil
+The  stream  which  has  been  opened  to the file `fil' (presumably the
+subject of some previous `Tofile' messages) is closed.  If `fil' was not
+in  fact  open  this  command  has  no  effect  (i.e. is harmless).  All
+open-for-output streams  are  automatically  closed  at  the  end  of  a
+message-list  evaluation,  so it is only necessary to invoke `Closefile'
+explicitly if you wish to  terminate  output  to  given  file  during  a
+message-list  evaluation.   (One reason why you might want to do this is
+so as not to have too many output files open at  one  time,  since  many
+UNIX  systems place a limit on the number of streams which a process can
+have.)
+
+	Appendfile fil
+If obeyed before any `Tofile' messages to destination `fil', causes  the
+file  to  be opened in `append-mode', so its previous contents are added
+to, instead of being replaced.
+
+See separate subsection on Input/Output of binary data for  explanation
+of the binary versions Stdoutb, Tofileb, Appendfileb.
+
+	System string
+Causes `string' to be executed as a shell command (by `/bin/sh') at this
+point  in  time.   Enables  arbitrary  UNIX  commands to be invoked from
+within a Miranda output list.  The shell process comes into  being  with
+its  streams (standard input, standard output, standard error) inherited
+from the Miranda process.
+
+	Exit num
+Causes the UNIX process evaluating the message list to terminate at this
+point  with  exit  status  `num'  (an  integer  between 0 and 127).  The
+remaining messages in the list (if any) are discarded.  The exit  status
+of  a  Miranda  evaluation which terminates other than by a call to Exit
+will be 0 if it terminates successfully or 1 if it encounters a  runtime
+error.   The  exit  status  is only relevant if you are using Miranda to
+implement a stand-alone UNIX command (see  separate  manual  page  about
+this).
+
+[Explanation: the exit status of a UNIX command is a one  byte  quantity
+which  is communicated back to the calling shell and can be tested by it
+- the usual convention is that 0 exit status means all ok, anything else
+means  something  was  amiss.  If you are not into shell programming you
+can safely ignore the whole issue.]
+
+_T_h_e_ _d_e_f_a_u_l_t_ _o_u_t_p_u_t_ _m_e_c_h_a_n_i_s_m
+
+We have stated above that the value of a  command  level  expression  is
+expected  to be of type `[sys_message]'.
+
+If it is not of that type mira applies the following rules:
+ (i) if the value is of type  [char]  the  characters  are  directed  to
+standard output, as if you had written [Stdout (expr)].
+ (ii)  if  it is of another type, show is first applied to convert it to
+type [char], so it is as if you had written [Stdout (show (expr))]
+
+This explains how the Miranda system is able to function in its standard
+`desk-calculator' mode.
+
+Be aware that if <stdenv> is not loaded (because you invoked  mira  with
+-stdenv, and the script does not explicitly %include <stdenv> there will
+be no type sys_message and only the default  output  mechanism  will  be
+available.
+
+_O_u_t_p_u_t_ _r_e_d_i_r_e_c_t_i_o_n
+
+A Miranda command of the form
+	exp &> pathname
+causes a background process to be set up for the  evaluation  of  `exp',
+with  both  the  standard  output  and  the standard error output of the
+process redirected to `pathname'.  If `exp' is  of  type  [sys_message],
+the  destination  of  `Tofile'  messages  are not affected by the global
+redirection - only messages which  would  otherwise  have  gone  to  the
+screen are sent to `pathname'.
+
+If two (blank separated) pathnames are given after  the  `&>',  standard
+output is redirected to the first file and standard error to the second.
+Thus:
+	exp &> outfil errfil
+
+If the `&>' is replaced by a `&>>', instead of overwriting the  previous
+contents, the relevant output is appended to the end of the file.  Thus:
+	exp &>> pathname(s)
+As  with  the  `&>'  command,  either one or two pathnames can be given,
+depending on whether you wish standard error to be merged with  standard
+out, or separated from it.
+
+Note that a background process created by a `&>' or `&>>' command has no
+standard input - if  the  expression  contains  `$-',  the  latter  will
+evaluate to `[]'.
+
+_I_m_p_l_e_m_e_n_t_a_t_i_o_n_ _R_e_s_t_r_i_c_t_i_o_n_s
+ Arguments representing pathnames (to Tofile, Appendfile, Closefile) are
+restricted  to  1024  characters  in length - pathnames longer than this
+cause an error message.  The shell command supplied to  System  is  also
+restricted to 1024 characters in length.
+

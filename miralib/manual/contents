@@ -1,0 +1,22 @@
+_M_i_r_a_n_d_a_ _S_y_s_t_e_m_ _M_a_n_u_a_l _ _C_o_p_y_r_i_g_h_t_ _R_e_s_e_a_r_c_h_ _S_o_f_t_w_a_r_e_ _L_i_m_i_t_e_d_ _1_9_8_5_-_2_0_2_0
+
+ 1. How to use the manual system    20. Algebraic types
+ 2. About the name "Miranda"        21. Abstract types
+ 3. About this release              22. Empty types
+ 4. The Miranda command interpreter 23. The special function _s_h_o_w
+ 5. Brief summary of main commands  24. Formal syntax of Miranda scripts
+ 6. List of remaining commands      25. Comments on syntax
+ 7. Expressions                     26. Miranda lexical syntax
+ 8. Operators                       27. The library mechanism
+ 9. Operator sections               28. The standard environment
+10. Identifiers                     29. Literate scripts
+11. Literals                        30. Some hints on Miranda style
+12. Tokenisation and layout         31. UNIX/Miranda system interface
+13. Iterative expressions           32. -->> CHANGES <<--
+14. Scripts, overview               33. Copying
+15. Definitions                     34. Bug reports
+16. Pattern matching
+17. Compiler directives
+18. Basic type structure            99. Create a printout of the manual
+19. Type synonyms                  100. An Overview of Miranda (paper)
+

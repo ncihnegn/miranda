@@ -1,0 +1,19 @@
+_S_y_n_t_a_x_ _o_f_ _l_i_b_r_a_r_y_ _d_i_r_e_c_t_i_v_e_s
+
+libdir:= %_i_n_c_l_u_d_e env(;)            parts:= part part*
+         %_e_x_p_o_r_t parts(;)
+         %_f_r_e_e { sig }              part:= identifier
+                                           fileid
+env:= fileid binder? aliases?              +
+                                           -identifier
+binder:= { binding binding* }
+                                    fileid:= "pathname"
+binding:= var = exp(;)                       <pathname>
+          tform == type(;)
+                                    _N_o_t_e_s For the  definition  of  `sig'
+aliases:= alias alias*              (=signature),  `var', `exp', `tform'
+                                    and `type' see the main manual  page
+alias:= identifier/identifier       on  formal  syntax  of Miranda.  For
+        IDENTIFIER/IDENTIFIER       the definition of  `identifier'  and
+        -identifier                 `IDENTIFIER'  see lexical syntax.
+

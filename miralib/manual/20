@@ -1,0 +1,126 @@
+_A_l_g_e_b_r_a_i_c_ _t_y_p_e_ _d_e_f_i_n_i_t_i_o_n_s
+
+The simplest method of introducing a new data type into a Miranda script
+is  by  means of an algebraic type definition.  This enables the user to
+introduce a new concrete  data  type  with  specified  constructors.   A
+simple example would be
+	tree ::= Nilt | Node num tree tree
+
+The `::=' sign is used  to  introduce  an  algebraic  data  type.   This
+definition introduces three new identifiers
+    `tree' a typename
+    `Nilt' a nullary constructor (i.e. an atom), of type tree
+    `Node' a constructor, of type num->tree->tree->tree
+
+Now we can define trees using constructors Nilt & Node, for example
+	t = Node 3 Nilt Nilt
+
+It is not necessary to have names for  selector  functions  because  the
+constructors  can  be  used in pattern matching.  For example a function
+for counting the number of nodes in a tree could be written
+	size Nilt = 0
+	size (Node a x y) = 1 + size x + size y
+
+Note that the names of constructors _m_u_s_t_ _b_e_g_i_n_ _w_i_t_h_ _a_n_ _u_p_p_e_r_ _c_a_s_e_ _l_e_t_t_e_r
+(and  conversely,  any identifier beginning with an upper case letter is
+assumed to be a constructor).
+
+An algebraic type can have any number (>=1)  of  constructors  and  each
+constructor  can  have any number (>=0) fields, of specified types.  The
+number of fields taken by  a  constructor  is  called  its  `arity'.   A
+constructor  of  arity zero is said to be atomic.  Algebraic types are a
+very general idea and include a number of special cases  that  in  other
+languages require separate constructions.
+
+One  interesting case that all of the constructors can be atomic, giving
+us what is called in PASCAL a `scalar enumeration type'.  Example
+	day ::= Mon|Tue|Wed|Thu|Fri|Sat|Sun
+
+The union of two types can also be represented as an algebraic data type
+- for example here is a union of num and bool.
+	boolnum ::= Left bool | Right num
+
+Notice  that  this  is  a `labelled union type' (the other kind of union
+type, in which the parts of the union are not distinguished  by  tagging
+information, is not permitted in Miranda).
+
+An  algebraic typename can take parameters, thus introducing a family of
+types.   This  is  done  be  using  generic  type  variables  as  formal
+parameters  of the `::=' definition.  To modify our definition of `tree'
+to allow trees with different types of labels at the nodes  (instead  of
+all `num' as above) we would write
+	tree * ::= Nilt | Node * (tree *) (tree *)
+
+Now  we  have  many  different  tree  types  -  `tree num', `tree bool',
+`tree([char]->[char])', and so on.  The constructors `Node'  and  `Nilt'
+are  both  polymorphic, with types `tree *' and `*->tree *->tree *->tree
+*' respectively.
+
+Notice that in Miranda objects of a recursive user defined type are  not
+restricted  to  being  finite.   For example we can define the following
+infinite tree of type `tree num'
+	bigtree = Node 1 bigtree bigtree
+
+_C_o_n_t_r_o_l_l_i_n_g_ _t_h_e_ _s_t_r_i_c_t_n_e_s_s_ _o_f_ _c_o_n_s_t_r_u_c_t_o_r_s
+
+Definition - a function f is strict iff
+	f _| = _|
+where _| is the value attributed to expressions which fail  to  terminate
+or  terminate with an error. To support non-strict functions the calling
+mechanism must not evaluate the arguments before  passing  them  to  the
+function - this is what is meant by "lazy evaluation".
+
+In Miranda constructors are, by default, non-strict in all their fields.
+Example
+
+	pair ::= PAIR num num
+	fst (PAIR a b) = a
+	snd (PAIR a b) = b
+
+First note that there is a predefined identifier "undef"  which  denotes
+undefined  -  evaluating  "undef"  in  a  Miranda session gives an error
+message. Consider the following Miranda expressions:
+
+	fst (PAIR 1 undef)
+	snd (PAIR undef 1)
+
+Both evaluate to `1', that is `PAIR' is non-strict in both arguments.
+
+The primary reason for making constructors non-strict in Miranda is that
+it is necessary to support equational reasoning on Miranda scripts.  (In
+the example given, elementary equational reasoning from  the  definition
+of  `fst'  implies  that  `fst(PAIR  1 anything)' should always have the
+value `1'.) It is also as a consequence of constructors being non-strict
+that Miranda scripts are able to define infinite data structures.
+
+It is, however, possible to specify  that  a  given  constructor  of  an
+algebraic data type is strict in one or more fields by putting `!' after
+the field in the `::=' definition of  the  type.   For  example  we  can
+change the above script to make PAIR strict in both fields, thus
+
+	pair ::= PAIR num! num!
+	fst (PAIR a b) = a
+	snd (PAIR a b) = b
+
+Now `fst (PAIR 1 undef)' and `snd  (PAIR  undef  1)'  both  evaluate  to
+undefined.   It  is a consequence of the `!' annotations that `PAIR a b'
+is undefined when either a or b is undefined.  It is  also  possible  to
+make PAIR strict in just one of its fields by having only one `!' in the
+type definition.
+
+In the case  of  a  recursively  defined  algebraic  type,  if  all  the
+constructors  having recursive fields are made strict in those fields it
+ceases to be possible to construct infinite objects of that type.  It is
+also  possible  to  deny  the possibility of certain infinite structures
+while permitting others.  For example if we modify the definition of the
+tree type first given above as follows
+	tree ::= Nilt | Node num tree! tree
+
+then it is still possible to construct trees which are infinite in their
+right branch but not "left-infinite" ones.
+
+The main reason for  allowing  `!'  annotations  on  Miranda  data  type
+definitions is that one of the intended uses of Miranda is as a SEMANTIC
+METALANGUAGE, in which to express the denotational  semantics  of  other
+programming languages.
+

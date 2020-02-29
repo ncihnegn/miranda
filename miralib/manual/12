@@ -1,0 +1,86 @@
+_T_o_k_e_n_i_s_a_t_i_o_n_ _a_n_d_ _l_a_y_o_u_t
+
+A Miranda script or expression is regarded as being composed of  _t_o_k_e_n_s,
+separated by _l_a_y_o_u_t.
+
+A token is one of the following -  an  identifier,  a  literal,  a  type
+variable,  or a delimiter.  Identifiers and literals each have their own
+manual section.  A type variable is a sequence of  one  or  more  stars,
+thus  *  **  ***  etc.   (see basic type structure).  Delimiters are the
+miscellaneous symbols, such as operators, parentheses, and keywords.   A
+formal  definition  of the syntax of tokens, including a list of all the
+delimiters in given under `Miranda lexical syntax'.
+
+_R_U_L_E_S_ _A_B_O_U_T_ _L_A_Y_O_U_T
+
+Layout consists of white space characters (spaces,  tabs,  newlines  and
+formfeeds),  and  comments.   A  comment  consists of a pair of adjacent
+vertical bars, together with all the text to the right of  the  bars  on
+the same line.  Thus
+        || this is a comment
+Layout  is  not  permitted  inside  tokens  (except  in  char and string
+constants, where it is significant) but may be inserted  freely  between
+tokens to make scripts more readable.  Layout is ignored by the compiler
+except in two respects:
+
+1) At least one space (or  other  layout  characters)  must  be  present
+between  two  tokens  that  would otherwise form an instance of a single
+larger token.  For example in
+        f 19 'b'
+we have a function, f, applied to a number and a character,  but  if  we
+were to omit the two intervening spaces, the compiler would read this as
+a single six-character identifier, because both digits and single-quotes
+are  legal  characters  in  an identifier.  (Where it is not required to
+force the correct tokenisation, or because  of  the  offside  rule,  see
+below, the presence of layout between tokens is optional.)
+
+2)  Certain  syntactic  objects  (roughly,  the  right  hand  sides   of
+declarations  --  for  an exact account see those entities followed by a
+`(;)' in the formal syntax) obey Landin's _o_f_f_s_i_d_e  _r_u_l_e  [Landin  1966].
+This  requires  that every token of the object lie either directly below
+or to the right of its first token.  A token which breaks this  rule  is
+said  to  be  `offside'  with  respect to that object and terminates its
+parse.  For example in
+        x = 2 < a
+        y = f q
+the 'y' is offside with respect to the right hand side of the definition
+of  'x'  (because it is to the left of the initial '2').  In such a case
+the trailing semicolon may be omitted from the right hand  side  of  the
+equation for x.
+
+It  is  because of the offside rule that Miranda scripts do not normally
+contain explicit semicolons as terminators for  definitions.   The  same
+rule  enables  the compiler to determine the scopes of nested _w_h_e_r_e's by
+looking at their indentation levels.  For example in
+	f x = g y z
+	      _w_h_e_r_e
+	      y = (x+1)*(x-1)
+	      z = p x (q y)
+	g r = groo (r+1)
+
+it is the offside rule which makes it clear that the definition  of  'g'
+is  not local to the right hand side of the definition of 'f', but those
+of 'y' and 'z' are.
+
+It is always possible to terminate a right  hand  side  by  an  EXPLICIT
+semicolon,  instead  of  relying  on  the offside rule.  For example the
+above script could be written all in one line, as
+  f x = g y z _w_h_e_r_e y = (x+1)*(x-1); z = p x (q y);; g r = groo (r+1);
+
+Notice that we need TWO semicolons after the definition of z - the first
+terminates  the  rhs of the definition of `z', and the second terminates
+the larger rhs of which it is a part, namely that of the  definition  of
+`f'.   If we put only one semicolon at this point, the definition of `g'
+would be local to that of `f'.
+
+This  example  should  convince  the  reader  that  code  using   layout
+information  to show the block structure is much more readable, and this
+is the normal practise.
+
+[_R_e_f_e_r_e_n_c_e P.J. Landin "The Next 700 Programming Languages", CACM vol  9
+pp157-165 (March 1966).]
+
+Note that an additional comment  convention  applies  in  scripts  whose
+first  character  is  a  `>'.   See  separate  manual entry on `literate
+scripts'.
+

@@ -1,0 +1,130 @@
+.TH JUST 1
+.UC 4
+.SH NAME
+just \- text justification program
+.SH SYNOPSIS
+.nf
+just [-<width>] [-t<tolerance>] [file...]
+.SH DESCRIPTION
+.I Just
+takes one or more files containing text and justifies them to a specified
+width, sending the result to standard output.
+Default <width> is 72. (The default can be changed by creating a file
+in the current directory called ".justwidth" and containing a number.)
+If no files are given 
+.I just
+takes its data from standard input.  Thus either of the following commands
+show the simplest use of
+.I just
+.PP
+just oldtext > newtext
+.br
+just < oldtext > newtext
+.PP
+This is a simple text formatting program, designed for situations
+where the more complex facilities of 
+.I nroff
+or
+.I troff
+are not required.
+It formats according to the following rules:
+.PP
+1) blank lines remain blank.
+.br
+2) if a line begins with spaces, these are preserved and it is not
+merged with the previous one.
+.br
+3) lines which begin with 8 or more spaces (equiv one tab),
+or which have a '>' sign in column 1, have their layout frozen completely.
+.PP
+Otherwise each line is merged with the previous line and reformatted so
+as to maximise the number of words in the line and then justify it to the
+specified width.  During reformatting the following two extra rules are
+observed:
+.PP
+(a) Between any of the sentence 
+terminators '.', '?', '!', and a following word on the same line,
+a minimum of
+two spaces will be preserved if present in the original text.
+.PP
+(b) Justification (i.e. padding out to the exact width)
+is not performed on a line when
+it would require the insertion of more than 
+.I <tolerance>
+extra spaces in any one place.  This rule is added to make
+.I just
+behave sensibly when formatting to a width allowing only a small
+number of words per line, eg for a newspaper column.
+The default tolerance is 3.
+.PP
+These rules
+are quite well adapted to the conventions of normal English text, and
+enable
+.I just
+to be used to format letters, and a variety of simple documents.
+Rule (3) provides two conventions whereby fragments of program, tables etc,
+can be embedded in such documents and protected from reformatting.
+Note that 
+.I just
+can safely be applied to its own output, eg to reformat to different widths.
+(Reapplying 
+.I just
+with the same width will leave the text unchanged.)
+.PP
+.I Just
+removes tabs from lines which it is reformatting, replacing them by
+spaces.  (But tabs in frozen lines will be left alone.)
+.PP
+.I Just
+knows about underlining (in the style "underline-backspace-character...")
+and handles underlined words and sentences correctly. 
+When preparing text which is to be continuously underlined across wordbreaks,
+each non-final line of underlined input should have a trailing
+underlined space.
+.PP
+Setting <tolerance> to zero, as in
+`just -t0' will cause reformatting without justification.  Specifying a
+negative width also has this effect.  That is `just --72' means 
+`just -72 -t0'.
+.SH SEE ALSO
+vi(1)
+.br
+fmt(1)  - the advantages of just
+over fmt are that it can format to different widths
+(fmt is fixed at 72), that it does justification, and that it knows about
+underlining.  Like fmt, just
+is conveniently called from inside vi, by using the `!' command.
+
+Examples, of using
+.I just
+inside
+.I vi:
+To reformat a paragraph, position the
+cursor at, or just above, the beginning of the paragraph, and say
+.br
+!}just
+.br
+To reformat the whole document say
+.br
+:1,$!just
+.br
+These are standard applications of the vi `!' command, which pipes
+pieces of text through an arbitrary UNIX command called from inside
+the editor - see vi documentation for more information.)
+.SH BUGS
+When preparing input text, you have to remember to leave at least one
+space at the front of each line which is not preceded by a blank line
+and which you
+.I don't
+want merged with the previous line, e.g. successive lines of an address.
+Note that this means that
+.I just
+cannot be used to reformat a paragraph all of whose lines are indented.
+(This is the one respect in which
+.I fmt 
+is superior to
+.I just.)
+.SH AUTHOR
+Research Software Limited.
+.I Just
+is included in the distribution file for Miranda(tm).

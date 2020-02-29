@@ -1,0 +1,7 @@
+case $OSTYPE in
+cygwin) echo no root user on cygwin; exit 1 ;;
+Interix) echo Administrator:+Administrators ;;
+darwin) echo root:wheel ;;
+solaris*) echo root:bin ;;
+*) echo root:root ;;
+esac

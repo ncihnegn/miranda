@@ -1,0 +1,116 @@
+_T_h_e_ _%_f_r_e_e_ _d_i_r_e_c_t_i_v_e_ _a_n_d_ _p_a_r_a_m_e_t_r_i_s_e_d_ _s_c_r_i_p_t_s
+
+It is permitted to construct a script containing definitions  which  are
+dependent  on information which will be supplied only when the script is
+made the subject of a %_i_n_c_l_u_d_e directive.  Such a script is said  to  be
+_p_a_r_a_m_e_t_r_i_s_e_d.   This  is  indicated  by  the presence in the script of a
+directive of the form
+
+	%_f_r_e_e { signature }
+
+where `signature' is a list of specifications  of  the  identifiers  for
+which  bindings will be provided at %_i_n_c_l_u_d_e time.  A script may contain
+at  most  one  %_f_r_e_e  directive,  which  must  therefore  give  all  the
+identifiers  on  which  the script is parametrised.  The %_f_r_e_e directive
+may appear anywhere in the script, but for  clarity  it  is  recommended
+that you place it at or near the top.
+
+For example a script (called "matrices"  say)  defining  the  notion  of
+matrix  sum  and  matrix  product,  for  matrices  of as-yet-unspecified
+element type, could be written as follows:-
+
+	%_e_x_p_o_r_t matmult matadd
+
+	%_f_r_e_e { elem :: _t_y_p_e
+		zero :: elem
+		mult, add :: elem->elem->elem
+	      }
+	
+	matrix == [[elem]]
+
+	matadd :: matrix->matrix->matrix
+	matadd xx yy = [[add a b|(a,b)<-zip2 x y]|(x,y)<-zip2 xx yy]
+
+	matmult :: matrix->matrix->matrix
+	matmult xx yy = outerprod innerprod xx (transpose yy)
+	innerprod x y = sum [mult a b|(a,b)<-zip2 x y]
+			_w_h_e_r_e
+			sum = foldr add zero
+	outerprod f xx yy = [[f x y|y<-yy]|x<-xx]
+
+Note that the identifiers declared under %_f_r_e_e may denote types as  well
+as  values.   When we write a %_i_n_c_l_u_d_e directive for the above script we
+must provide bindings for all of its free identifiers.  The bindings are
+given in braces following the pathname (and before the aliases, if any).
+Thus:-
+
+	%_i_n_c_l_u_d_e "matrices" {elem==num; zero=0; mult=*; add=+; }
+
+In  the  scope  of  the  script  containing  the  above  directive   the
+identifiers   `matmult'   and   `addmult'  will  be  available  at  type
+[[num]]->[[num]]->[[num]] and will behave as if  their  definitions  had
+been  written  using  0, (+), (*) in place of the identifiers zero, add,
+mult.
+
+The order in which the bindings are given is immaterial (it need not  be
+the  order in which the identifiers occurred in the %_f_r_e_e directive) but
+a binding must be given  for  each  free  identifier  of  the  %included
+script.   Note that the binding for a type is given using `==' and for a
+value using `='.  If the types of all the bindings (taken together)  are
+not  consistent  with the information given in the free directive of the
+%included script, or if any required binding is  missing,  the  compiler
+will reject the %_i_n_c_l_u_d_e directive as incorrect.
+
+The main advantage of a parametrised script is that  different  bindings
+may  be  given  for  its  free  identifiers on different occasions.  For
+example the  same  script  "matrices"  may  be  invoked  with  different
+bindings  to  provide a definition of matrix addition and multiplication
+over matrices with elements of type bool.  Thus:-
+
+	%_i_n_c_l_u_d_e "matrices" {elem==bool; zero=False; mult=&; add=\/; }
+
+It is even possible to %_i_n_c_l_u_d_e the same parametrised  script  twice  in
+the  same  scope  (presumably  with  different  bindings  for  the  free
+identifiers) but in this case it will be be necessary to alias apart the
+two  sets of exported identifiers to avoid a nameclash.  So we might add
+`b_matadd/matadd b_matmult/matmult' to the above directive  if  it  were
+being used in the same script as the previous one.
+
+_M_i_s_c_e_l_l_a_n_e_o_u_s_ _p_o_i_n_t_s
+
+By default the identifiers declared %_f_r_e_e in a parametrised  script  are
+not  exported  from  the  script.   As  always this can be overridden by
+explicitly listing them in an %_e_x_p_o_r_t directive.
+
+Free typenames of non-zero arity are declared in the following style.
+
+	%_f_r_e_e { stack * :: _t_y_p_e
+		table * ** :: _t_y_p_e
+		...
+	      }
+
+The corresponding bindings could be as follows
+
+	%_i_n_c_l_u_d_e ... {stack * == [*]; table * ** == [(*,**)]; ... }
+
+When a parametrised script exports a  locally  created  typename  (other
+than  a synonym type), each instantiation of the script by a %_i_n_c_l_u_d_e is
+deemed to create a NEW type (this is relevant to deciding whether or not
+two  types are the same for the purpose of readopting a type orphan, see
+previous manual section).  This is because the compiler assumes that  an
+abstract  or  algebraic  type  defined  in a parametrised script will in
+general have an internal structure that depends on the free identifiers.
+
+Finally  note  that  the  bindings  for  the  free  identifiers   of   a
+parametrised  script  must  always  be  given  EXPLICITLY.   For example
+suppose we wish to %_i_n_c_l_u_d_e the file  "matrices"  in  a  script  already
+containing  a  type  called  `elem'  over  which  we intend to do matrix
+multiplication.  We must write
+
+	%_i_n_c_l_u_d_e "matrices" {elem==elem; etc. }
+
+The binding `elem==elem' is not redundant, nor is it cyclic, because the
+two  `elem's  involved refer to two different scopes (on the left of the
+binding, that of the includee, and on  the  right  that  of  the  script
+containing the directive).
+

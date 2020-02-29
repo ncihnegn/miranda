@@ -1,0 +1,83 @@
+_E_n_v_i_r_o_n_m_e_n_t_ _v_a_r_i_a_b_l_e_s_ _u_s_e_d_ _b_y_ _M_i_r_a_n_d_a
+ (This section may be of particular interest to  installers  and  system
+administrators)
+
+The behaviour of the `mira' program is  sensitive  to  the  settings  of
+certain environment variables.
+
+An alternative location for the miralib directory may  be  specified  by
+setting  the  environment variable "MIRALIB".  An explicit -lib flag, if
+present, overrides this.
+
+The  first time it is called (i.e. if no .mirarc file is present, either
+in the home directory or in miralib) the miranda  system  picks  up  the
+name  of  the  resident editor from the environment variable EDITOR - if
+this is not set it assumes `vi'.
+
+At startup (version 2.044 and later) `mira' inspects LC_CTYPE or if that
+is  empty  LANG,  to  determine  if it is running in a UTF-8 locale.  On
+Windows/Cygwin this information is taken  from  the  "user-default  ANSI
+code page".  The flag -UTF-8 or -noUTF-8, if present, overrides.
+
+If the environment variable RECHECKMIRA is set (to any non-empty string)
+the  Miranda  system  rechecks  to see if any relevant source files have
+been updated, and performs  any  necessary  recompilation,  before  each
+interaction  with the user - this is the appropriate behaviour if an (eg
+emacs) editor window is being kept open permanently during  the  Miranda
+session.   If  this  environment  variable  is  not  set,  the  check is
+performed only after `/e' commands and `!' escapes.
+
+To decide  what  shell  to  use  in  `!'  escapes,  mira  looks  in  the
+environment  variable  SHELL (this will normally contain the name of the
+user's login shell).  If no SHELL is entered in the environment, /bin/sh
+is assumed.
+
+If environment variable MIRAPROMPT is set, its contents will be used  as
+the  session  prompt,  instead of the default prompt "Miranda " (version
+2.044 and later).
+
+If the environment variable NOSTRICTIF is set (to any non-empty  string)
+Miranda accepts old scripts with no `if' after the guard comma.
+
+For displaying pages of the manual mira uses the program entered in  the
+environment  as  VIEWER  -  if  this  variable is not set the default is
+likely to be 'more -d' or (roughly equivalent) 'less -EX'.
+
+If you set VIEWER to something, you may also need to set an  environment
+variable RETURNTOMENU.
+
+RETURNTOMENU=YES prevents another prompt being  given  after  displaying
+each  section, causing instead an immediate return to contents page.  It
+should be `YES' if VIEWER is a program that pauses for input at  end  of
+file (eg "less"), `NO' if VIEWER is a program that quits silently at end
+of file (eg "more", "less -EX").
+
+Finally note that a third environment variable MENUVIEWER can be set  to
+choose  the  program  used to display contents pages (by default this is
+normally 'cat' or 'more').
+
+To find the current settings of these display commands enter
+	???
+to the "next selection" prompt of the manual system.
+
+_H_o_w_ _t_o_ _s_e_t_ _a_n_ _e_n_v_i_r_o_n_m_e_n_t_ _v_a_r_i_a_b_l_e_ _i_n_ _y_o_u_r_ _U_N_I_X_ _s_h_e_l_l_:
+ (Reminder/tutorial information)
+
+Example, setting the environment variable VIEWER to /usr/local/view
+
+ (i) if you use a Bourne-like shell (sh ksh bash)
+     say at the UNIX command level (i.e. before calling Miranda)
+
+     export VIEWER=/usr/local/view
+
+     to undo the above say `unset VIEWER',
+     to make permanent add this line to your .profile or .bashrc
+
+ (ii) if you use a C shell (csh tcsh)
+      say at the UNIX command level (i.e. before calling Miranda)
+
+      setenv VIEWER /usr/local/view
+
+      to undo the above say `unsetenv VIEWER',
+      to make permanent add the setenv line to your .login or .cshrc
+

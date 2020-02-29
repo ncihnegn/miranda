@@ -1,0 +1,55 @@
+_T_h_e_ _u_s_e_ _o_f_ _`_s_h_o_w_'_ _f_o_r_ _c_o_n_v_e_r_t_i_n_g_ _o_b_j_e_c_t_s_ _t_o_ _t_h_e_i_r_ _p_r_i_n_t_ _r_e_p_r_e_s_e_n_t_a_t_i_o_n_s
+
+The need often arises to convert  an  arbitrary  Miranda  value  to  its
+printable   representation  as  a  string.   For  numbers  the  function
+`shownum' (of type num->[char]) can be used for  this  purpose.   To  be
+able  to  do  this  conversion  for  any  type of object would seemingly
+require an infinite number of  functions,  one  for  each  type.   As  a
+solution to this problem Miranda provides a special keyword, `_s_h_o_w'.
+
+For any object x
+	_s_h_o_w x
+is  a string containing the printable representation of x.  For example,
+if x is a number the above expression is equivalent to `shownum x'.   In
+the  general  case, however, x could be a structured object of arbitrary
+complexity.  Note that _s_h_o_w is a reserved word, not an identifier.
+
+In fact `_s_h_o_w' behaves under most circumstances as  though  it  was  the
+name  of a function, of type *->[char].  For example it can be passed as
+a parameter, so that say,
+	map _s_h_o_w [a,b,c,d,e]
+is a legal expression of type [[char]].
+
+There are three important restrictions on the universality of _s_h_o_w.
+
+(i) You cannot `show' functions in any useful sense.  (That would  be  a
+violation  of  referential transparency.) The result of applying _s_h_o_w to
+any kind of function is just the string "<function>".
+
+(ii)  You  cannot  `show'  an  abstract  object  unless  an  appropriate
+show-function was included when the type was defined (see manual section
+on Abstract types).  The result of applying _s_h_o_w to such an object is by
+default just the string "<abstract ob>".
+
+(iii)  When it occurs in a script the context in which _s_h_o_w is used must
+be such as to determine its type _m_o_n_o_m_o_r_p_h_i_c_a_l_l_y.  An example:
+	my_show x = "hello\n"++_s_h_o_w x++"goodbye\n"
+In the absence of any other type information, the  compiler  will  infer
+that  my_show has type *->[char], and that x is of type `*'.  The use of
+_s_h_o_w is therefore polymorphic, and will be rejected as illegal.
+
+If however we intend that my_show will be used only on objects  of  type
+`tree',    say,   and   we   add   to   the   script   the   declaration
+`my_show::tree->[char]', then the above use of _s_h_o_w becomes monomorphic,
+and will be accepted.
+
+The  essence of restriction (iii) is that _s_h_o_w is not a true polymorphic
+function of type *->[char], but rather a family of monomorphic functions
+with the types T->[char] for each possible monotype T.  The context must
+be sufficient for the compiler to determine which member of  the  family
+is required.
+
+(For  technical  reasons  this  restriction applies only in scripts.  In
+command-level  expressions  _s_h_o_w  behaves  as  if  it  were  a   genuine
+polymorphic function.)
+

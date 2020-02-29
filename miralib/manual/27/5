@@ -1,0 +1,132 @@
+_S_e_p_a_r_a_t_e_ _c_o_m_p_i_l_a_t_i_o_n_ _a_n_d_ _`_._x_'_ _f_i_l_e_s
+
+The  Miranda  compiler  compiles  to  an  intermediate  code,  based  on
+combinators.   When a Miranda expressions are evaluated in the course of
+a session this code is executed by an interpreter.
+
+Since compilation is a  complex  process  (involving  lexical  analysis,
+parsing, type checking and code-generation, as well as a number of other
+minor steps) it is undesirable that the results of  compiling  a  script
+should  just  be  "thrown  away"  at  the  end  of  a session.  To avoid
+unnecessary acts  of  recompilation  the  Miranda  system  maintains  an
+object-code  file  in  association  with  each  source file containing a
+Miranda script.
+
+For each source file, called say `script.m',  the  Miranda  system  will
+create an object code file, called `script.x'.  No action is required by
+the user to keep these files up-to-date, since this  is  taken  care  of
+automatically by the Miranda system.  The .x files are never referred to
+directly by the Miranda user, and you should not try to edit them  (they
+contain  binary  data).
+
+You may however safely remove any .x file (if for example you don't wish
+it  to  use  up  filespace)  since  this will at worst cause the Miranda
+compiler to do some extra work later to recreate it.
+
+If you select a script as the current script of a Miranda  session,  and
+it  has  an  up-to-date  .x  file, this will be loaded instead, avoiding
+recompilation.  If the .x file does not exist, or _a_n_y_ _ _r_e_l_e_v_a_n_t_ _ _s_o_u_r_c_e_ 
+_f_i_l_e_ _h_a_s_ _b_e_e_n_ _m_o_d_i_f_i_e_d since the .x file was created, the script will be
+recompiled (and a side effect of your having selected this  source  file
+as  the  current script will be to bring into existence an up-to-date .x
+file for it).
+
+[Inductive definition - source file B is `relevant' to source file A iff
+file  A %inserts or %includes B or any file to which B is relevant.  For
+a discussion of `%include' and the other library directives  see  manual
+sections on `The Library Mechanism'.]
+
+Note that compiling a script containing %include  statements  will  have
+the  side  effect of triggering subsidiary compilation processes for any
+relevant source files which have been modified since their corresponding
+.x  file  was created.  Users familiar with the UNIX program `make' will
+recognise this process as essentially the same  as  that  which  happens
+when a `makefile' is obeyed.  In the case of Miranda however, the `make'
+process is fully automated by being built into the compiler.
+
+_M_o_r_e_ _a_d_v_a_n_c_e_d_ _i_n_f_o_r_m_a_t_i_o_n
+
+If you want to check that a  given  Miranda  script  has  an  up-to-date
+object  code  file  _w_i_t_h_o_u_t  entering  a  Miranda  session,  this can be
+accomplished from UNIX by calling mira with a special flag, thus
+	mira -make script.m
+
+will force the existence of an  up-to-date  `script.x',  performing  all
+(and only) those compilations which are necessary.  Any number of source
+files can be given after  the  -make  flag  (and  as  usual  if  a  `.m'
+extension is omitted it will be added automatically).
+
+Example:- to make  sure  every  Miranda  source  file  in  your  current
+directory has an up-to-date object code file, say `mira -make *.m'.
+
+Applying mira -make to a `.x' file is equivalent to applying it  to  the
+corresponding `.m' file.  So another way to make sure everything in your
+current directory is up-to-date is to say `mira -make  *.x'.   This  has
+the  advantage  that it will also remove any `.x' files whose `.m' files
+no longer exist.
+
+In the best UNIX tradition mira -make  does  its  work  silently  unless
+something  is wrong.  If the source files are all correct closed scripts
+with up-to-date  `.x'  files,  mira  -make  says  nothing  at  all.   If
+recompilations are necessary it informs you which source files are being
+compiled, and, as a last step, the names of any  scripts  which  contain
+errors or undefined names are listed, to stdout.
+
+The exit status  of  a  `mira  -make'  (relevant  if  you  are  a  shell
+programmer,  or wish to include a `mira -make' command in a makefile for
+a larger setup) is as follows.  If (AFTER any  necessary  recompilations
+have  been  performed)  all the source files have up-to-date `.x' files,
+and do not contain any syntax errors, type errors,  or  undefined  names
+(these  facts  are  recorded  in  .x files) the exit status will be zero
+(=ok), otherwise it will be 1.
+
+It is possible to find out what names are  exported  from  one  or  more
+Miranda scripts without entering a Miranda session by using the command
+	mira -exports files
+(as  always  the `.m' extension is added automatically to each filename,
+if missing).  This command first calls `mira -make'  on  each  file,  to
+make  sure everything is uptodate, and then lists to standard output the
+exported names together with their types (one per line).  If  more  than
+one  file  is specified each group of names will be preceded by the name
+of the file to which they appertain.
+
+Note that the export profile of a script includes information about  its
+free identifiers (if any).
+
+It is also possible to find out the names of all files on which a  given
+set  of  Miranda scripts depend, via %include and %insert statements, by
+using the command
+	mira -sources files
+This lists to standard output, one per line, the names of  all  relevant
+source  files.   The  standard  environment, <stdenv>, is always omitted
+from the list.
+
+_E_f_f_e_c_t_ _o_f_ _`_m_v_'_ _a_n_d_ _`_r_m_'
+ Finally we note a couple of points about the behaviour  of  Miranda  .x
+files under applications of mv and rm to their corresponding sources.
+
+A `.x' file records (inter alia) the names of all relevant source  files
+relative  to  the  directory  in which it is stored, together with their
+`date and time last modified'.  Note that the UNIX command `mv' does not
+alter the time-last-modified of the file being moved.  So it is possible
+when moving a miranda source file (or a group of  interdependant  source
+files)  from  one  directory  to  another  to  save  mira  the bother of
+recompiling them, simply by moving all the relevant `.x' files into  the
+new directory along with the sources.  (This doesn't work however if you
+change the name of any of the source files during the move.)
+
+[Note that `tar' has  the  same  property,  so  the  up-to-date-ness  of
+Miranda .x files is preserved across a tape dump.]
+
+If you use `rm' to remove a Miranda  source  file,  the  next  time  you
+invoke  mira  with the (now non-existent) file as its current script, it
+will promptly remove the corresponding `.x' file.  The logic of this  is
+as  follows:- `.x' files must be kept up-to-date with their sources, and
+the way to make a `.x' file up-to-date with a non-existent source is  to
+make  it  too non-existent.  As a consequence it is not possible to send
+someone a Miranda object code  file  without  the  corresponding  source
+(mira will delete it as soon as they try to use it!).
+
+From some points of view this last feature might be regarded as a bug  -
+a way round it may be provided in a later release of the Miranda system.
+

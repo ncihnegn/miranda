@@ -1,0 +1,174 @@
+_P_a_t_t_e_r_n_ _M_a_t_c_h_i_n_g
+
+The notion of `pattern' plays an important role in Miranda.   There  are
+three  contexts in which patterns can be used - in function definitions,
+in  conformal  definitions,  and  on  the  left  of  the  `<-'  in  list
+comprehensions.    We  first  explain  the  general  rules  for  pattern
+formation, which are the same in all three contexts.
+
+Patterns are built from variables  and  constants,  using  constructors.
+Here are some simple examples.
+	x
+	3
+	(x,y,3)
+The  first pattern is just the variable x, the second is the constant 3,
+the last example is built from two variables and a constant,  using  the
+(,,)  constructor  for 3-tuples.  The components of a structured pattern
+can themselves be arbitrary patterns, permitting  nested  structures  of
+any depth.
+
+A  pattern  can  also  contain  repeated  variables, e.g.  `(x,1,x)'.  A
+pattern containing repeated variables matches  a  value  only  when  the
+parts of the value corresponding to occurrences of the same variable are
+equal.
+
+The constructors which can be used in a pattern include those  of  tuple
+formation  `(..,..)',  list formation `[..,..]', and the constructors of
+any user defined Algebraic  Type  (see  separate  manual  section).   In
+addition  there are special facilities for matching on lists and natural
+numbers, as follows.
+
+(Lists) The `:' operator can be used in patterns,  so  for  example  the
+following three patterns are all equivalent (and will match any 2-list).
+	a:b:[]
+	a:[b]
+	[a,b]
+Note that `:' is right associative (see manual section on Operators).
+
+(Natural numbers) It is permitted to write patterns of  the  form  `p+k'
+where  p  is  a  pattern  and  k  is  a  literal integer constant.  This
+construction will succeed in matching a value n, if and only if n is  an
+integer  >=k,  and  in  this  case  p is bound to (n-k).  Example, `y+1'
+matches  any   positive   integer,   and   `y'   gets   bound   to   the
+integer-minus-one.
+
+Note that the automatic coercion from integer to floating  point,  which
+takes  place  in  expression  evaluation,  does  not  occur  in  pattern
+matching.  An integer pattern such as `3' or `n+1' will  not  match  any
+floating point number.  It is not permitted to write patterns containing
+floating point constants.
+
+_C_a_s_e_ _a_n_a_l_y_s_i_s
+
+The main use of pattern matching in Miranda is in the left hand side  of
+function  definitions.  In the simplest case a pattern is used simply to
+provide the right hand side of the function definition  with  names  for
+subcomponents of a data structure.  For example, functions for accessing
+the elements of a 2-tuple may be defined,
+	fst_of_two (a,b) = a
+	snd_of_two (a,b) = b
+
+More generally  a  function  can  be  defined  by  giving  a  series  of
+equations,  in which the use of different patterns on the left expresses
+case analysis on the argument(s).  Some simple examples
+	factorial 0 = 1
+	factorial(n+1) = (n+1)*factorial n
+
+	reverse [] = []
+	reverse (a:x) = reverse x ++ [a]
+
+	last [a] = a
+	last (a:x) = last x, if x~=[]
+	last [] = error "last of empty list"
+
+Many more examples can be  found  in  the  definition  of  the  standard
+environment  (see  separate manual section).  Note that pattern matching
+can be combined with  the  use  of  guards  (see  last  example  above).
+Patterns  in  a  case  analysis  do  not  have  to be mutually exclusive
+(although as a matter of programming style that is good practice) -  the
+rule  is that cases are tried in order from top to bottom, and the first
+equation which `matches' is used.
+
+_C_o_n_f_o_r_m_a_l_ _d_e_f_i_n_i_t_i_o_n_s
+
+Apart from the simple case where the pattern is a single  variable,  the
+construction
+	pattern = rhs
+
+is called a `conformal definition'.  If the value of the right hand hand
+side matches the structure of the given pattern, the  variables  on  the
+left are bound to the corresponding components of the value.  Example
+	[a,b,3] = [1,2,3]
+
+defines  a  and b to have the values 1 and 2 respectively.  If the match
+fails anywhere, all the  variables  on  the  left  are  _u_n_d_e_f_i_n_e_d.   For
+example, within the scope of the definition
+	(x,x) = (1,2)
+
+the  value of x is neither 1 nor 2, but _u_n_d_e_f_i_n_e_d (i.e. an error message
+will result if you try to access the value of x in any way).
+
+As a constraint to prevent "nonsense" definitions, it is a rule that the
+pattern  on the left hand side of a conformal definition must contain at
+least one variable.  So e.g. `1  =  2'  is  not  a  syntactically  valid
+definition.
+
+_P_a_t_t_e_r_n_s_ _o_n_ _t_h_e_ _l_e_f_t_ _o_f_ _g_e_n_e_r_a_t_o_r_s
+
+In a list comprehension (see separate manual entry) the bound entity  on
+the  left  hand  side of an `<-' symbol can be any pattern.  We give two
+simple examples - in both examples we assume x is a list of 2-tuples.
+
+To  denote  a  similar  list but with the elements of each tuple swapped
+over we can write
+	[(b,a)|(a,b)<-x]
+
+To extract from x all second elements of a 2-tuple whose first member is
+17, we can write
+	[ b |(17,b)<-x]
+
+_I_r_r_e_f_u_t_a_b_l_e_ _p_a_t_t_e_r_n_s (*)
+ (Technical note, for people interested in denotational semantics)
+
+DEFINITION:- an algebraic type having only one constructor and for which
+that  constructor is non-nullary (ie has at least one field) is called a
+_p_r_o_d_u_c_t _t_y_p_e.  The constructor of a product type is  called  a  `product
+constructor'.
+
+Each type of n-tuple (n~=0) is also defined to be a  product  type.   In
+fact it should be clear that any user defined product type is isomorphic
+to a tuple type.  Example,  if we define
+	wibney ::= WIB num bool
+then the type wibney is isomorphic to the tuple type (num,bool).
+
+A pattern composed only of  product-constructors  and  identifiers,  and
+containing  no  repeated  identifiers, is said to be "irrefutable".  For
+example `WIB p q', `(x,y,z)' and `(a,(b,c))' are  irrefutable  patterns.
+We show what this means by an example.  Suppose we define f, by
+
+	f :: (num,num,bool) -> [char]
+	f (x,y,z) = "bingo"
+
+As a result of the constraints of strong typing, f can only  be  applied
+to objects of type (num,num,bool) and given any actual parameter of that
+type, the above equation for f MUST match.
+
+Interestingly, this works even if the actual parameter is an  expression
+which does not terminate, or contains an error.  (For example try typing
+	f undef
+and you will get "bingo", not an error message.)
+
+This is because of  a  decision  about  the  denotational  semantics  of
+algebraic  types  in  Miranda  -  namely  that product types (as defined
+above) correspond to the domain construction DIRECT PRODUCT (as  opposed
+to  lifted  product).  This means that the bottom element of a type such
+as (num,num,bool) behaves indistinguishably from (bottom,bottom,bottom).
+
+Note that singleton types such as the empty tuple type `()', or say,
+	it ::= IT
+are not product types under the above definition, and therefore patterns
+containing  sui-generis  constants such as () or IT are not irrefutable.
+This corresponds to a semantic decision that we do NOT wish to  identify
+objects such as () or IT with the bottom element of their type.
+
+For a more detailed discussion of  the  semantics  of  Miranda  see  the
+formal language definition (in preparation).
+
+------------------------------------------------------------------------
+(*) A useful discussion of the semantics of pattern-matching,  including
+the  issue  of  irrefutable patterns, can be found in (chapter 4 of) the
+following
+   S.  L.  Peyton-Jones ``The Implementation of Functional Programming
+   Languages'', Prentice Hall International, March 1987.
+   ISBN 0-13-453333-X
+

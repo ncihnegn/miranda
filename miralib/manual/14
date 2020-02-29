@@ -1,0 +1,66 @@
+_S_c_r_i_p_t_s
+
+In Miranda the script is  the  persistent  entity  that  is  saved  from
+session  to session (i.e.  it plays the role of what is called a program
+in conventional languages).  Associated with a Miranda  session  at  any
+given  time  is  a  single current script, identified by a UNIX pathname
+ending in `.m'.
+
+A script is a collection of declarations, establishing an environment in
+which  you  wish to evaluate expressions.  The order of the declarations
+in a script is not significant - for example  there  is  no  requirement
+that an identifier be defined before it is used.
+
+An identifier may not have more than one top-level binding  in  a  given
+script.
+
+Here are the kinds of declaration that can occur in a script:
+
+1)  a  definition (of a function, data structure etc. - see manual entry
+`definitions' for more details).  Example
+	fac n = product[1..n]
+
+2) a specification of the type of one or more identifiers, of the form
+	var-list :: <type>
+Example
+	fac :: num->num
+See 'Basic type structure' for an account of possible types.  Note  that
+these  type  specifications are normally optional, since the compiler is
+able  to  deduce  them  from  the  definitions  of   the   corresponding
+identifiers.  It is however possible to introduce an identifier by means
+of a type specification only, without  giving  it  a  defining  equation
+(such  identifiers  are  said  to be `specified but not defined' and are
+useful  in  program  development).   A  special  case  of  this  is  the
+introduction  of  an  otherwise undefined typename - see separate manual
+entry on `placeholder types'.
+
+3) the definition of a user defined type - these  are  of  three  kinds,
+synonyms, algebraic types, and abstract types (see separate manual entry
+on each).
+
+4) a library directive (%export,  %include  or  %free)  these  are  used
+specify  the  interfaces  between  separately  compiled  scripts  -  see
+separate manual entry on the library mechanism.
+
+There is a manual entry giving the formal syntax of Miranda scripts.
+
+_N_o_t_e
+ A directory called `ex' (meaning `examples') containing a collection of
+example  scripts  is supplied with the Miranda system, and will be found
+under the `miralib' directory (usually kept at  /usr/lib/miralib  -  the
+Miranda  session  command  `/miralib'  will tell you where it is on your
+system).
+
+A convention  which  the  Miranda  system  consistently  understands  in
+Miranda  session  commands,  library  directives etc. is that a pathname
+enclosed in <angle_brackets>, instead of "string_quotes" is relative  to
+the  miralib  directory.   In  particular  note that the Miranda session
+command
+	/cd <ex>
+will change your current directory to  be  "..../miralib/ex".   You  can
+then say, e.g.
+	!ls
+to see what's in there.  In fact there is a README file, so a good thing
+to say next would be
+	!vi README
+

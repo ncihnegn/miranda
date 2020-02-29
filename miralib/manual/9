@@ -1,0 +1,62 @@
+_S_e_c_t_i_o_n_s
+
+An infix operator can be partially applied, by supplying  it  with  only
+one  of its operands, the result being a function of one argument.  Such
+expressions are always parenthesised, to avoid ambiguity, and are called
+`sections'.   Two  different  kinds  of sections (called presections and
+postsections) are possible since either the first or the second  operand
+can be supplied.
+
+An example of a presection is
+	(1/)
+which denotes the reciprocal function.  An example of a postsection is
+	(/3)
+which gives a concise notation for the `divide by three' function.  Note
+that  both of these examples are functions of type (num->num).  With one
+exception (see below) sections can be formed using any  infix  operator.
+Further  examples  are  (0:)  which is a function for prefixing lists of
+numbers with zero, and (^2) which is the square function.
+
+Sections  may  be  regarded  as  the  analogue  of  currying  for  infix
+operators.  They are a minor syntactic convenience, and  do  not  really
+add  any  power  to the language, since any function denoted in this way
+could have been introduced by explicit definition.  For  the  first  two
+examples given above we could have written, say
+	reciprocal y = 1/y
+	divide_by_three x = x/3
+and then used the function names, although this would have been somewhat
+more verbose.
+
+To summarise the conventions for infixes, taking infix  division  as  an
+example, note that the following expressions are all equivalent.
+	a / b
+	(/) a b
+	(a /) b
+	(/ b) a
+
+The usual  rules  about  operator  precedence  (see  manual  section  on
+operators)  apply  to sections.  For example we can write (a*b+) but not
+(a+b*), because `*' is more binding than `+'.  The latter example should
+have   been  written  ((a+b)*).   As  always  when  writing  complicated
+expressions, if there is any possibility of ambiguity it  is  better  to
+put in extra parentheses.
+
+_S_p_e_c_i_a_l_ _c_a_s_e
+ It is not possible to form a postsection in infix minus, because  of  a
+conflict of meaning with unary minus.  For example:
+	(-b)
+is  a  parenthesised  occurrence of negative b, not a section.  As a way
+round this there is a function `subtract' in  the  standard  environment
+with  the  definition:-  subtract x y = y - x.  This is a normal curried
+function, so we  can  write  (subtract  b)  to  get  the  function  that
+subtracts b from things.
+
+Presections in infix minus, such as (a-), cause no ambiguity.  There are
+no  problems  with infix plus because Miranda does not have a unary plus
+operator.
+
+_A_c_k_n_o_w_l_e_d_g_e_m_e_n_t:
+ The idea of sections is due  to  Richard  Bird  (of  Oxford  University
+Programming  Research Group) and David Wile (of USC Information Sciences
+Institute).
+

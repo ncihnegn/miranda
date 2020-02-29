@@ -1,0 +1,7 @@
+#!/bin/sh
+rm -f miralib/menudriver
+if test -z "`echo -n`" -o ! \( -x /bin/csh -o -x /usr/bin/csh \)
+then ln -s menudriver.sh miralib/menudriver
+else ln -s menudriver.csh miralib/menudriver
+fi
+echo `ls -l miralib/menudriver`

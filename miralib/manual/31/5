@@ -1,0 +1,105 @@
+_H_o_w_ _t_o_ _c_h_a_n_g_e_ _t_h_e_ _d_e_f_a_u_l_t_ _e_d_i_t_o_r
+
+The Miranda /edit or /e command (see  manual  page  on  Miranda  command
+interpreter)  invokes  an  editor.  By default this is the screen editor
+"vi", but if you wish to use another editor, this is easily changed.
+
+The Miranda command
+	/editor
+
+reports the editor currently in use by the Miranda system.  To change it
+to (for example) pico, say
+	/editor pico
+
+Alternatively, when next invoking the miranda system from UNIX  you  can
+supply it with a flag requesting a specific editor by name, as follows:
+	mira -editor pico
+
+In either case it is only necessary to do this once  since  the  Miranda
+system  stores  this and other information in a file called ".mirarc" in
+your home directory - you should not remove or try to edit this file.
+
+You can select any editor that is installed on your system.  If you  are
+unfamiliar  with  vi  and haven't an editor in mind, the editor pico (if
+installed) is particularly easy to use - it has instructions on  screen.
+Similar  are nano (an open source clone of pico) and joe.  Other editors
+include emacs and gvim - these both open a separate editor window.
+
+The editor you select will be used by both the /e command and by
+	??identifier
+which opens the relevant source file at the definition of identifier.
+
+_M_o_r_e_ _a_d_v_a_n_c_e_d_ _i_n_f_o_r_m_a_t_i_o_n
+
+The Miranda system is designed to work with an editor which can  open  a
+file  at  a  specified line number.  For example to make the editor `vi'
+open `file' at line 13, the UNIX command is
+        vi +13 file
+the Miranda system has built in knowledge of this, so if  the  installed
+editor  is `vi' and the compiler has found a syntax error in the script,
+the `/e' command will open the script at the line containing the error.
+
+To retain this ability when substituting another editor,  the  `/editor'
+command  requires  a  template for invoking the chosen editor at a given
+line number.  In this template the line number  is  represented  by  the
+character  `!'  and  the filename by `%'.  For example the full template
+for `vi' would be supplied as follows
+        /editor vi +! %
+
+If the `%' character does not occur in the template,  Miranda  will  add
+the  name  of  the  file at the end of the command.  So the template for
+`vi' could equally well be given as
+	/editor vi +!
+The same formula works for pico, nano, joe.  If the editor is  one  that
+starts up its own window, separate from the Miranda session window (gvim
+and emacs do this), you will want to make the editor run as a concurrent
+process by putting "&" at the end of the command, thus
+	/editor emacs +! % &
+Note  that  in  this  case  you  must include % where the filename goes,
+because adding it after the "&" would not make sense.
+
+In fact Miranda has built in knowledge of vi, pico, nano, joe, emacs and
+gvim,  so  just  giving the name of the editor will generate the correct
+template in these cases.
+
+If you install an editor without  the  capability  to  be  opened  at  a
+specified  line  number  (i.e.   you  cannot  give  a  template  for  it
+containing the `!' character), the /e command loses its ability to go to
+the right place after an error, and the `??' command will be disabled.
+
+The Miranda system will work without either of these features, but there
+is a significant loss of power in the user interface.
+
+If the installed editor lacks the `open at line number' feature, you may
+find  it  convenient  to  have  the  script  listed to the screen during
+compilation (this feature of the compiler can be switched on and off  by
+the  commands `/list', `/nolist').  As an assistance to naive users, the
+Miranda system turns on `/list' for you if the `/editor' command is used
+to install an editor without the `open at line number' feature.
+
+[Pathological case: if the editor command you wish to install contains a
+literal  `!'  or  `%'  that  you  don't want replaced, place a backslash
+before the relevant !  or %.  This protects it from being expanded.]
+
+_C_h_e_c_k_i_n_g_ _f_o_r_ _s_o_u_r_c_e_ _u_p_d_a_t_e_s
+
+If during a session changes have been made to any relevant source  file,
+the  Miranda  system automatically recompiles the current script and any
+other scripts which it directly or indirectly `%includes' and which have
+been  changed.   At  a  minimum this check is performed after each /edit
+command and after each shell escape.
+
+A mode of operation possible on a windowing system is to keep an  editor
+window and Miranda session window both open.  In this case more frequent
+checking is appropriate and you should say /recheck (see 6  "Summary  of
+remaining  commands").   This  sets  a  flag  which  tells  the  Miranda
+interpreter to check for source file  updates  before  each  evaluation,
+instead  of  only  after /e and !  commands.  But remember that you will
+need to save any edits to file before the `mira' session can see them.
+
+As an assistance to naive users /recheck is automatically turned  on  if
+/editor  is  used  to install an editor template which includes "&", the
+symbol used in UNIX shell commands to start a concurrent process.
+
+Say /norecheck to revert to the default behaviour.
+

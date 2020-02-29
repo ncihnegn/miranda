@@ -1,0 +1,42 @@
+#! /bin/sh
+if test -f contents
+then cat contents
+else echo printman: no contents; exit
+fi
+if test -f ../.version
+then read VERSION < ../.version
+else VERSION=??
+fi
+echo "printout of online manual pages for version $VERSION"
+cat .epoch
+echo
+cat permission
+echo
+for i in ? ??
+do  test "$i" = "99" && exit
+    echo ::::::::::::::::::::::
+    echo $i
+    echo ::::::::::::::::::::::
+    if test -d $i
+    then if test -f $i/contents
+         then cat $i/contents
+         else echo $i: no contents; break
+         fi
+         for j in $i/?
+         do echo ::::::::::::::::::::::
+            if test -d $j
+            then echo $j omitted           #don't go into 3rd level
+                 echo ::::::::::::::::::::::
+            else echo $j
+                 echo ::::::::::::::::::::::
+                 cat $j
+            fi
+         done
+    else cat $i
+    fi
+done
+echo ::::::::::::::::::::::
+echo APPENDIX
+echo ::::::::::::::::::::::
+echo
+cat 100

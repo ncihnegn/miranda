@@ -1,0 +1,8 @@
+_T_h_e_ _M_i_r_a_n_d_a_ _L_i_b_r_a_r_y_ _M_e_c_h_a_n_i_s_m
+
+ 1. Syntax of library directives
+ 2. The %include directive (basic information)
+ 3. About library directives (more detailed information)
+ 4. The %free directive and parametrised scripts
+ 5. Separate compilation and `.x' files
+

@@ -1,0 +1,66 @@
+_C_o_m_p_i_l_e_r_ _d_i_r_e_c_t_i_v_e_s
+
+Certain keywords, beginning with `%', modify the action of the  compiler
+when  present in a script.  These are called `compiler directives'.  The
+directives currently available are as follows.
+
+%list %nolist
+ If the `/list' feature is  enabled  (switched  on  and  off  by  /list,
+/nolist  at  command  level) the compiler echos the source to the user's
+terminal during compilation of a Miranda script.  The directives  %list,
+%nolist  may be placed in a file to give more detailed control over this
+behaviour.  If the compiler is in an  echoing  state  then  encountering
+`%nolist'  causes  it  to  cease  echoing from that point onwards in the
+source, until the next occurrence of '%list' or the end  of  the  source
+file  in  which  the  directive  occurs, whichever is the sooner.  These
+directives may occur anywhere in a script and  have  no  effect  on  the
+semantics  (i.e.   they  are  just  like  comments,  apart from having a
+side-effect on the lex analyser).
+
+If  the  `/list' feature of the compiler is not enabled these directives
+are ignored.  Since the default state of the compiler is  now  `/nolist'
+these  directives are of marginal value and retained only for historical
+reasons.
+
+%insert
+ A directive of the form
+        %insert "pathname"
+may occur anywhere in a Miranda script, and is textually replaced by the
+contents  of  the file "pathname" during lexical analysis.  The pathname
+must be given as a literal string, enclosed  in  double  quotes.   (Most
+uses of this directive are now better handled by %include, see below).
+
+If the %insert directive is textually indented in the file in  which  it
+occurs, the whole of the inserted text will be treated as being indented
+by the same amount as the initial `%' of the directive.
+
+Insert  directives  may be invoked recursively, to a depth limit imposed
+by the operating system, typically about 16, which should be enough  for
+any   reasonable   purpose.    Note  that  the  pathnames  are  resolved
+statically, not dynamically, so that the meaning of an _%_i_n_s_e_r_t directive
+is computed relative to the file in which it occurs, NOT relative to the
+directory from which the compiler was invoked.
+
+The use of static rather than dynamic pathname resolution is a departure
+from  normal  UNIX conventions (both the `C' compiler and the UNIX shell
+resolve pathnames dynamically) but is much more convenient in practice.
+
+Note that if the subject of an %insert directive is a  complete  Miranda
+script  it  is  always better to use %include (see manual section on the
+library mechanism), since this  avoids  needless  recompilation  of  the
+definitions  of the subsidiary script.  The use of %include also imposes
+a hierarchical scope discipline, and is more  likely  to  lead  to  well
+structured code.
+
+A point to beware of when using %insert is that unlike %include, it does
+NOT add a missing `.m' extension to its pathname argument automatically.
+This is because the argument file may contain an arbitrary piece of text
+(e.g.   an expression or a signature) and need not be a complete Miranda
+script, so it would be inappropriate to insist that it's pathname end in
+`.m' in all cases.
+
+%include %export %free
+ These directives control the  identifier  bindings  between  separately
+compiled  scripts.  See separate manual entry on `the library mechanism'
+for details.
+

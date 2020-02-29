@@ -1,0 +1,80 @@
+_C_o_m_m_e_n_t_s_ _o_n_ _t_h_e_ _s_y_n_t_a_x_ _f_o_r_ _M_i_r_a_n_d_a_ _s_c_r_i_p_t_s
+
+The syntax equations given express the syntax of Miranda scripts insofar
+as  this  can  be done by a context free grammar.  It therefore does not
+attempt to express the scope rules, nor the requirement that a script be
+well-typed,  both  of  which  are  context sensitive restrictions on the
+syntax given here.  The formal definition of  Miranda  [in  preparation]
+will  deal with these matters and also give a denotational semantics for
+the language.
+
+Nevertheless, if the syntax is read in  conjunction  with  the  informal
+description  of  the  language (see other manual sections and referenced
+papers) it should be found fairly informative, especially if the  reader
+has some previous exposure to this style of language.
+
+Key to abbreviations in syntax:-
+>    alt=alternative 	  	decl=declaration    def=definition
+>    e1=operator_expression	exp=expression      fnform=function_form
+>    libdir=library_directive	pat=pattern         qualifs=qualifiers
+>    rhs=right_hand_side 	sig=signature	    spec=specification
+>    tdef=type_definition 	tform=typeform	    var=variable
+>    whdefs=where_defs
+
+_C_o_n_v_e_n_t_i_o_n_s
+ We use a variant of BNF, in  which  non-terminals  are  represented  by
+lower case words, `:=' is used as the production symbol, and alternative
+productions are written on successive  lines.   (These  departures  from
+convention are adopted because `::=' and `|' are concrete symbols of the
+language.)
+
+For any non-terminal x,
+        x*	means zero or more occurrences of x
+        x?      means the presence of x is optional
+        x-list  means one or more x's (separated by commas if >1)
+        x(;)    means that  x  is  followed by an optional semicolon and
+is subject to the _o_f_f_s_i_d_e _r_u_l_e (see section on Layout),  so  that  every
+token  of  x  must lie below or to the right of the first.  Provided the
+layout makes it clear where x terminates, the trailing semicolon may  be
+omitted.
+
+_N_o_t_e_s
+
+The syntax of  the  library  directives  (denoted  by  the  non-terminal
+`libdir') is given in a separate manual entry.
+
+Ambiguities  in  the  syntax  for `type' and `construct' are resolved by
+noting that `->' is less binding than `$typename' or `$constructor'  and
+that all three are right associative.
+
+In connection with the productions for argtype, note that type  such  as
+`[num,bool]'  is  an  abbreviation for `[(num,bool)]' and represents the
+type of a list of tuples - the Miranda system  itself  never  uses  this
+abbreviation when printing a type, but accepts it in user scripts.  (Use
+of this abbreviation is not recommended - it will  probably  be  removed
+from the syntax at the next release.)
+
+Ambiguities in the syntax for `fnform' and `pat' are resolved by  taking
+into  account  the  relative  binding  powers  of  the  infix  operators
+involved.  Specifically that `:' is right associative and  less  binding
+than  `+', which is left associative, and that $constructor, $var have a
+higher binding power than either of these, and are right associative.
+
+The productions given for `cases' correctly describe the concrete syntax
+of  these  entities,  including  the  way the offside rule is applied to
+them.  This concrete syntax is in one sense misleading, however.  Namely
+in  that  if  a  `lastcase' with a trailing `wheredefs' is preceded by a
+series of alternatives, the scope of the names introduced by  the  _w_h_e_r_e
+IS THE WHOLE `cases' IN WHICH IT OCCURS, AND NOT JUST THE `lastcase'.
+
+Note that for compatibility with earlier versions of Miranda the use  of
+the keyword `if' is optional.
+
+The ambiguities in the syntax given for `e1' are resolved by taking into
+account the relative binding powers of the operators (see manual section
+on Operators).
+
+The syntax of identifier, IDENTIFIER, literal, literal1,  numeral,  nat,
+infix,  infix1,  prefix,  prefix1,  and  typevar are given under Lexical
+Syntax (see next manual section).
+

@@ -1,0 +1,175 @@
+_U_s_i_n_g_ _M_i_r_a_n_d_a_ _t_o_ _b_u_i_l_d_ _e_x_e_c_u_t_a_b_l_e_ _f_i_l_e_s
+
+FIRST METHOD (using a `magic string')
+
+Create a file, prog.m say, containing a normal miranda script, but  with
+first line
+	#! /usr/bin/mira -exec
+
+The first two characters must be "#!" followed by an optional space  and
+the absolute pathname of the miranda interpreter.  This may be somewhere
+other than /usr/bin/mira, the UNIX shell  command  "which  mira"  should
+tell  you where it is.  The flag "-exec" is necessary and no other flags
+should be added.  (Note "-exec2" can be  substituted  for  "-exec",  see
+below.)
+
+The remainder of the file can be any legal  miranda  script,  which  may
+%include  other  scripts. Somewhere in the file, or in an included file,
+there must be a definition of `main'.  When `prog.m' is  executed  as  a
+UNIX  command,  the  result  will be that `main' is evaluated, using the
+same rules as if you had entered it in an interactive session,  and  the
+results  sent  to  standard  output.   Remember to give the file execute
+permission (e.g. by saying `chmod +x prog.m').
+
+A  command  of  this form can take data from the terminal.  The notation
+`$-' can be used anywhere in the second and later lines of the  file  to
+denote  the  list of characters taken from the standard input.  (That is
+`$-' behaves like a Miranda identifier of type [char].)
+
+The command can be invoked with arguments, eg
+	prog.m fig 23
+and the notation `$*' can be used in the script as a Miranda  identifier
+of  type  [[char]]  denoting the argument list, with the convention that
+the initial (zero'th) argument is the name of the command.  So  in  this
+case the value of `$*' would be
+	["prog.m","fig","23"]
+If there are no arguments, `$*' will be a singleton list containing just
+the command name.
+
+_E_x_p_l_a_n_a_t_i_o_n
+ The line beginning `#!' is a standard UNIX incantation, called a `magic
+string',  indicating that the following pathname is an interpreter to be
+invoked with the name of the file in which it occurs  as  argument  (see
+under  `execve'  in  section  2  of  the UNIX manual).  The flag "-exec"
+instructs the Miranda system to evaluate `main', which  can  be  of  any
+type.   If  main is a string this is sent to stdout, if it is of another
+printable type `show main' is sent to stdout, or  if  main  is  of  type
+[sys-message] the sequence of I/O commands is executed.
+
+Examples
+ Here is the Miranda "hello world" program
+	#! /usr/bin/mira -exec
+	main = "hello world\n"
+	
+The following script is a Miranda version of the UNIX `cat' command - if
+it  is  invoked without arguments it simply copies its standard input to
+its standard output, otherwise  it  concatenates  the  contents  of  its
+argument files to the standard output.
+	#! /usr/bin/mira -exec
+
+	main = [Stdout $-], _i_f tl $* = []
+             = [Stdout (concat(map read(tl $*)))],     _i_f badargs=[]
+             = [Stderr (concat(map errmess badargs))], _o_t_h_e_r_w_i_s_e
+	badargs = [f|f<-tl $*;~member(filemode f)'r']
+	errmess f = f++": cannot access\n"
+
+See the manual pages on input from UNIX files and output to  UNIX  files
+for  the  explanation of `read', `filemode' and the constructors Stdout,
+Stderr etc.
+
+The rule that Miranda source files must have names ending in ".m" is not
+enforced  for  "magic" scripts, in keeping with the UNIX convention that
+executables require no special suffix.  However  a  magic  script  whose
+name  ends  in  ".m"  can also be made the subject of a miranda session.
+This is advantageous during development, as individual  definitions  can
+be tested.  A first line beginning #! is ignored by the Miranda compiler
+which treats it as a comment.  In this situation $* has  the  value  [],
+since the script was not executed as a command.
+
+Note also that if your Miranda executable file has the  ".m"  suffix,  a
+corresponding  ".x" file will be created at its first call, avoiding the
+need for mira to recompile it on subsequent calls (unless there has been
+an update of the source file).
+
+Notes
+ (1) In some UNIX-like systems `execve' places  a  limit  on  the  total
+length of the `magic string'.
+ (2)  Because in many systems (including Linux) `execve' permits at most
+one flag in a magic string, mira does not understand a `-lib' flag given
+in  conjunction  with  a  `-exec'  flag.   This  is a possible source of
+difficulty if you keep the miralib directory at  a  non-standard  place.
+One  way  round  this is to set environment variable MIRALIB, instead of
+using a `-lib' flag.  See manual section on flags  etc.   [To  do:  more
+general mechanism to add other flags to -exec in a magic string - DT]
+ (3) If called from the UNIX command line,
+	mira -exec script.m
+will  find and evaluate `main' in script.m and in this situation you can
+combine -exec with other flags, -lib miralib, -heap N, etc preceding the
+name of the script.  Any additional arguments following script.m will
+be found in $*.
+
+_D_e_b_u_g_g_i_n_g_ _s_t_a_n_d_-_a_l_o_n_e_ _s_c_r_i_p_t_s
+ As an aid to debugging a variant flag is available:
+	#!/usr/bin/mira -exec2
+        definitions...
+The -exec2 flag has the same effect as -exec but runtime  errors  (only,
+not compile time errors) are redirected to file miralog/prog, where prog
+is the name of the script.  The redirection takes  place  if  a  miralog
+directory  exists  in  the  current  working  directory  and the process
+running the script has write permission  to  it.   This  is  useful  for
+debugging  cgi  scripts  written  in  Miranda,  particularly  in the not
+infrequent situation that they compile without errors and seem  to  work
+fine  from the command line but fail when invoked by an http call.  (You
+will need to create a directory miralog  in  cgi-bin  and  chown  it  to
+apache, or whatever personality cgi scripts run as).
+
+SECOND METHOD (using a `here document')
+
+Create a file ("prog' say) containing the following
+
+	mira [script] <<!
+	exp1
+	exp2
+	.
+	.
+	.
+	!
+
+The `!' after << can be replaced by any character sequence  -  the  same
+sequence, on a line by itself, terminates the `here document'.
+
+Remember to make the file executable (by saying `chmod +x  prog').   Now
+when  `prog'  is executed as a UNIX command, the result will be that the
+miranda  expressions  `exp1',  `exp2'  ...  will  be  evaluated  in  the
+environment  defined  by  `script', and the results sent to the standard
+output.  As usual, if `script' is omitted, a default name `script.m'  is
+assumed.   The  text following the special redirection `<<!' is called a
+"here-document".  The contents of the here-document are fed to the  mira
+command  in place of its standard input.  (So anything you would type to
+the miranda system at top level can appear in the here document.)
+
+Here-documents are a normal feature of UNIX, not  something  special  to
+miranda.   Miranda's  only  contribution to making this work smoothly is
+that it detects when its input is not coming from  a  terminal,  and  in
+this  case  suppresses prompts and other extraneous feedback.  Note also
+that  lines  beginning  `||'  are  ignored  by   the   Miranda   command
+interpreter,  which  gives  a way to include comments in the text of the
+here-document.
+
+The program `prog' might be invoked with  one  or  more  arguments,  for
+example,
+	prog big 23
+In  the  here-document,  `$1'  can be used to denote the first argument,
+`$2' the second and so on - in this case  `big'  and  `23'  respectively
+will  be textually substituted for these before the here-document is fed
+to mira as input.  Arguments not present are  replaced  by  empty  text.
+Other  replacements  carried  out on the text of the here-document are -
+`$*' is replaced by all the arguments together, as  a  single  piece  of
+text,  `$#'  is  replaced by the number of arguments present (`2' in the
+case shown above), and `$0' is replaced by the name of the program being
+executed (in this case `prog').  
+
+If the here-document contains instances of  `$'  which  you  don't  want
+replaced by something (for example inside a Miranda string), you have to
+escape them by preceding them with a backslash character.   But  if  the
+delimiter after the >> is in quotation marks, eg
+	mira [script] <<"!"
+	stuff
+        !
+then no substitutions will take place inside the here-document.
+
+The drawbacks of commands built in this way are two - (a) they  have  no
+way  of  taking  information from the terminal during execution (because
+the here-document replaces the standard input) and  (b)  the  method  of
+access to command line arguments is clumsy.
+

@@ -1,0 +1,60 @@
+_I_d_e_n_t_i_f_i_e_r_s
+
+An identifier consists of a letter followed by zero or  more  additional
+characters  which  may  be  letters  digits  or  occurrences  of  _ or '
+(underscore and single quote) Examples:
+        x  yellow  p11d  y'  GROSS_INCOME
+Note that both upper and lower case letters are allowed,  and  they  are
+treated  as different, so x and X are not the same identifier.  There is
+no restriction on the length of identifiers, and all the characters  are
+significant   in   deciding   whether  two  identifiers  are  the  same.
+Identifiers fall into two different classes (called in the formal syntax
+`identifier' and `IDENTIFIER') depending on whether their initial letter
+is upper or lower case.
+
+Identifiers are used for three different purposes in Miranda  -  (i)  as
+variables,  i.e.  names for values (note that the names of functions are
+also considered to be variables), (ii) as typenames, such as `bool'  and
+`char', and (iii) as constructors (see section on algebraic types).  The
+names of constructors must  begin  with  an  upper  case  letter,  while
+variables  and typenames must begin with a lower case letter.
+
+Reserved  words  -  the  following  are  special  symbols of the Miranda
+language.
+
+_a_b_s_t_y_p_e _d_i_v _i_f _m_o_d _o_t_h_e_r_w_i_s_e _r_e_a_d_v_a_l_s _s_h_o_w _t_y_p_e _w_h_e_r_e _w_i_t_h
+ (10)
+
+These are often shown as underlined (or bold)  in  published  documents,
+but in programs they are typed as ordinary lower case words (which means
+that these words cannot be used as identifiers).
+
+_P_r_e_d_e_f_i_n_e_d_ _i_d_e_n_t_i_f_i_e_r_s
+
+The following identifiers are normally* predefined and always in  scope.
+They  constitute  the  `standard  environment'.  They are defined in the
+script "stdenv.m", contained in the directory /usr/lib/miralib.
+
+(a) predefined typenames
+    bool char num sys_message
+
+(b) predefined constructors
+    False True :: bool
+    Appendfile Closefile Exit Stderr Stdout System Tofile :: sys_message
+
+(c) predefined variables
+    abs and arctan cjustify code concat const converse cos decode  digit
+    drop dropwhile e entier error exp filemode filter foldl foldl1 foldr
+    foldr1 force fst getenv hd hugenum id  index  init  integer  iterate
+    last  lay  layn  letter  limit lines ljustify log log10 map map2 max
+    max2 member merge min min2 mkset neg numval or  pi  postfix  product
+    read  readb  rep  repeat reverse rjustify scan seq showfloat showhex
+    shownum showoct showscaled sin snd sort  spaces  sqrt  subtract  sum
+    system take takewhile tinynum tl transpose undef until zip zip2 zip3
+    zip4 zip5 zip6 (91)
+
+See manual entry `Standard environment' for a listing of  its  contents.
+
+[*You can suppress automatic inclusion of <stdenv> by  calling  mira  with
+  flag  "-stdenv".  See manual section 31/7 "Options, setup files etc"]
+

@@ -1,0 +1,98 @@
+_R_E_C_E_N_T_ _C_H_A_N_G_E_S
+
+January 2020 (version 2.066)
+
+The Miranda source code has been revised to conform to the C11  standard
+and  to  run  on both 64 and 32 bit platforms.  Earlier releases were 32
+bit only.
+
+December 2019 (version 2.057)
+
+Miranda type `char' now includes all Unicode characters,  which  can  be
+specified by hexadecimal escape codes in char and string constants.  For
+example '\x5d2' is the Hebrew letter Gimel.
+
+The lexical syntax of Miranda has been extended  to  include  octal  and
+hexadecimal numerals - e.g. 0o777 is 511 and 0xffffffff is 4294967295.
+
+See man section 11 (literals) for details of both the above.
+
+Functions showoct,  showhex  ::  num->[char]  have  been  added  to  the
+standard environment.
+
+Data types with "laws", declared obsolete at release two,  have  finally
+gone.   Strictness  annotations: `!' on fields of an algebraic data type
+remain part of the language, see man section 20 (algebraic data types).
+
+The flag -exp, for executable scripts,  has  gone  and  is  replaced  by
+-exec,  see  man  section  31/4  (Using Miranda to build UNIX commands).
+This is not backwards  compatible  (sorry)  but  the  change  needed  is
+trivial.  If you have a magic script
+	#!/usr/bin/mira -exp
+	expression
+	definitions...
+change it to
+	#!/usr/bin/mira -exec
+        main = expression
+        definitions...
+The  new mechanism executes `main' wherever it is in the script (whereas
+-exp required an expression on the second line).
+
+_O_l_d_e_r_ _C_h_a_n_g_e_s (in reverse date order)
+
+September 2009 (version 2.044)
+
+The environment variable MIRAPROMPT may be set to a string to be used as
+the Miranda session prompt instead of the default "Miranda ".
+
+For reading/writing binary files in UTF-8 locale, stdenv is extended by
+        readb, Stdoutb, Tofileb, Appendfileb
+these behave similarly to
+        read, Stdout, Tofile, Appendfile
+but transfer data as bytes with no conversions from/to UTF-8.   See  new
+manual section 31/9.
+
+August 2008 (version 2.041, 2.042)
+
+Miranda now detects if it is in UTF-8 locale and converts from/to  UTF-8
+on reading/writing string and char values.
+
+May 2006 (version 2.032)
+
+The commands /nostrictif, /strictif to control enforcement  of  `if'  in
+guard  syntax  have  gone.   The  `if' has been part of Miranda's syntax
+since 1988.  In case there are surviving if-less scripts, you can use
+	mira -nostrictif
+or set the environment variable NOSTRICTIF to any non-empty string.
+
+New command /recheck makes mira check if  any  loaded  script  has  been
+updated before every evaluation, instead of only after /edit (/norecheck
+to disable).  Appropriate if an editor window  is  running  concurrently
+with  the  Miranda  session  window.   The  setting  is  remembered  for
+subsequent sessions.  Formerly enabled by setting  environment  variable
+RECHECKMIRA to a non-empty string - that method still works also.
+
+mira now checks that it has miralib of same version number - exits  with
+error  message  otherwise.   An explicit mira -lib <path> overrides this
+but it is in general inadvisable to run mira with wrong miralib.
+
+_H_i_s_t_o_r_y_ _o_f_ _M_i_r_a_n_d_a_ _r_e_l_e_a_s_e_s
+
+1 May 1985 - alpha test, released to University of Kent only.
+
+October 1985 - beta test (version 0.292 for VAX, 0.293 for SUN)
+Distributed to 88 sites.
+
+April 1987 - release one (version 1.009 or 1.016 or  1.019)
+Added  literate  scripts, library mechanism: %export, %include, (n+k) patterns.
+Around 250 sites.
+
+October 1989 - release two (versions 2.0xx for various machines)
+Added unbounded size integers, %free, faster SK reduction m/c
+Around 550 sites by mid-90's.
+
+May 2006 - revised and released as free software (but not open source).
+
+Nov 2019 - revised and made open source.
+
+Jan 2020 - revised to C11 standard and made 64 bit compatible.

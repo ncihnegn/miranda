@@ -1,0 +1,42 @@
+_R_e_a_d_i_n_g_ _w_i_t_h_ _i_n_t_e_r_p_r_e_t_a_t_i_o_n_ _(_`_r_e_a_d_v_a_l_s_'_ _a_n_d_ _`_$_+_'_)
+
+There is a function _r_e_a_d_v_a_l_s which takes a string  representing  a  UNIX
+pathname,  and  returns a list of values found in the file of that name.
+The values may be represented by arbitrary Miranda expressions,  written
+one  per  line.   Blank  lines,  and  Miranda style comments (||...) are
+ignored.  If the input file appears to be a teletype, _r_e_a_d_v_a_l_s reacts to
+syntactically  incorrect  or wrongly typed data by prompting the user to
+repeat the line, and such bad values are omitted from the  result  list.
+If  the  input  file  does  not appear to be a teletype, bad data causes
+readvals to abort with an error message.
+
+Note that, similarly to _s_h_o_w
+ (i) _r_e_a_d_v_a_l_s is a reserved word, not an identifier.
+ (ii) the context in which it is used must be such as to  determine  its
+type  monomorphically.   Extra  type specifications may be needed in the
+script to meet this condition.
+
+Here is a simple example of how _r_e_a_d_v_a_l_s might be used in a script
+	x :: [num]
+	x = readvals "data"
+The file `data' should contain expressions of type num (one per line).
+
+The _r_e_a_d_v_a_l_s function provides  Miranda  with  a  simple  form  of  data
+persistence - data can be written to a file (e.g. using `_s_h_o_w') and read
+back using _r_e_a_d_v_a_l_s in a later session.  Data objects saved in this  way
+must  of  course  be  finite.  Notice also that if you wish to save data
+containing functions, you will have to set up some special  arrangement,
+since such data cannot be written out using `_s_h_o_w'.
+
+Data of abstract type can be written to file using _s_h_o_w  and  read  back
+with  _r_e_a_d_v_a_l_s - provided that an appropriate show-function was included
+in the signature of the abstract type (see manual  section  on  abstract
+types).
+
+Finally note that $+ behaves exactly like an application of _r_e_a_d_v_a_l_s  to
+the  name  of  the  file  to which the standard input is connected.  For
+example
+	sum $+
+read a sequence of numeric expressions from the keyboard (one per  line)
+up to the next control-D, and then returns their sum.
+

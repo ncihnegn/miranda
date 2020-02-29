@@ -1,0 +1,55 @@
+_A_b_o_u_t_ _t_h_i_s_ _r_e_l_e_a_s_e
+
+This is Miranda release two of October 1989 rereleased thirty  years  on
+as  open source - as historical record and in the hope that it may still
+be useful.  Originally released in 1985, Miranda was  the  first  widely
+used  non-strict, purely functional language with polymorphic typing and
+had a significant influence on the development of the field.
+
+The source code has been revised to the current C standard (C11)  so  it
+will  compile  for both 32 and 64 bit platforms.  Various bugs have been
+fixed and some features added (see the Changes section  of  the  manual)
+but  the  Miranda  language  and  main  features of the system interface
+remain unchanged.  The manual has been revised in places for clarity and
+to remove out of date material.
+
+The online manual pages are primarily intended to document the system at
+the  level  required  by  someone  who  already  knows quite a lot about
+programming languages and  has  some  previous  exposure  to  functional
+programming.  There is a certain amount of tutorial material, but if you
+are a beginner to functional programming  you  may  find  parts  of  the
+manual hard to follow, and will need to seek help elsewhere.
+
+The following paper gives a convenient summary of the main  features  of
+Miranda:
+  D. A. Turner "An Overview of Miranda", SIGPLAN Notices, December 1986.
+A copy of this paper is included in the manual pages, but this and other
+information about Miranda can be found on the world wide web at
+	miranda.org.uk
+
+Miranda has two available text books
+
+1. Simon Thompson "Miranda: the Craft of Functional Programming",
+   Addison-Wesley, 470 pages, 1995.
+	ISBN 0-201-42279-4 (Paperback)
+A webpage for the book by the author is at
+	www.cs.kent.ac.uk/people/staff/sjt/Miranda_craft/
+or follow the link under BOOKS at miranda.org.uk.
+
+2. Chris Clack, Colin Myers & Ellen Poon "Programming with Miranda",
+   Prentice Hall, 312 pages, 1995.
+	ISBN 0-13-192592-X
+The rights in this book have reverted to the authors who  have  made  it
+available online - follow link under BOOKS at miranda.org.uk.
+
+There were two other texts, both now out of  print,  but  there  may  be
+copies in a library or with second hand book sellers.
+
+  Richard Bird & Philip Wadler "An Introduction to Functional Programming",
+  Prentice Hall, 293 pages, March 1988.
+  This used a mathematical notation, quite closely based on Miranda but
+  equally suitable for use with other functional languages.
+
+  Ian Holyer "Functional Programming with Miranda"
+  Pitman, 215 pages, 1991
+

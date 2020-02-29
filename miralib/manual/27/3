@@ -1,0 +1,286 @@
+_E_x_p_l_a_n_a_t_i_o_n_ _o_f_ _l_i_b_r_a_r_y_ _d_i_r_e_c_t_i_v_e_s
+
+The three directives  %_i_n_c_l_u_d_e  %_e_x_p_o_r_t  %_f_r_e_e  constitute  the  Miranda
+library  mechanism,  which  controls  the sharing of identifiers between
+separately compiled scripts.   The  %_f_r_e_e  directive  is  covered  in  a
+separate manual entry and will not be discussed further here.
+------------------------------------------------------------------------
+
+%_i_n_c_l_u_d_e "file"
+
+The presence of this directive, anywhere in a Miranda script, causes all
+the  identifiers  exported from the Miranda script "file" to be in scope
+in the containing script.  Note that "file" should  be  the  name  of  a
+Miranda source file (by convention these all have names ending in `.m').
+
+The following conventions apply to all filenames in library directives:
+ 1) A fileid can be an arbitrary UNIX pathname
+ 2) If the fileid given does not end in `.m' this is added.
+ 3)  If  the  fileid  is  surrounded by angle brackets instead of string
+quotes it is  assumed  to  be  a  pathname  relative  to  the  `miralib'
+directory,  otherwise it is taken to be relative to the directory of the
+script in which the directive occurs.  (Examples, "pig"  means  "pig.m",
+<stdenv> means "/usr/lib/miralib/stdenv.m")
+
+In addition (if you are using Berkeley UNIX or  a  derivative)  the  `~'
+convention  of  the  cshell  may be used to abbreviate home directories.
+That is `~' abbreviates your own home directory, and  ~jack  abbreviates
+jack's home directory, at the front of any pathname.
+
+The file mentioned in a  %_i_n_c_l_u_d_e  directive  must  contain  a  CORRECT,
+CLOSED  Miranda script.  (That is it must have no syntax or type errors,
+and no undefined names.) An attempt to %_i_n_c_l_u_d_e a  file  which  violates
+these  conditions  will be rejected by the compiler as a syntax error in
+the script containing the %_i_n_c_l_u_d_e statement.
+
+It is also illegal to %_i_n_c_l_u_d_e a script which causes nameclashes, either
+against  top-level identifiers of the including script or those of other
+%_i_n_c_l_u_d_e directives in the script.
+
+The effect of an %_i_n_c_l_u_d_e directive can be modified by following it with
+one  or  more  aliases  (which  are  used  to remove nameclashes between
+identifiers exported from the included script and those of the  current
+script  or  of  other  %_i_n_c_l_u_d_e  files).   There are two forms of alias,
+`new/old' which  renames  and  `-old'  which  suppresses  an  identifier
+altogether.
+
+For example suppose we wish to include the file "mike" but  it  contains
+two  identifiers,  f  and  g say, which clash with top-level bindings of
+these identifiers in the current script.  We  wish  to  use  the  "mike"
+definition  of  `f',  but  his  `g'  is  of  no interest.  The following
+directive could be used.
+
+%_i_n_c_l_u_d_e "mike" -g mike_f/f
+
+Any other identifiers exported from "mike", not  specifically  mentioned
+in the aliases, will be accepted unchanged.
+
+It is permitted to alias typenames, and constructors (say `NEW/OLD') but
+typenames and constructors cannot be  suppressed  by  a  `-name'  alias.
+Note  that  if you alias one or more of the constructors of an algebraic
+data type the behaviour of `_s_h_o_w'  on  objects  of  that  type  will  be
+modified in the appropriate way.
+
+A file which has been %included may itself contain %_i_n_c_l_u_d_e  directives,
+and  so  on, to any reasonable depth.  A (directly or indirectly) cyclic
+%_i_n_c_l_u_d_e is not permitted, however.
+
+The  `?identifier'  command  can  be  used to find the ultimate place of
+definition of an imported identifier.  When aliasing has taken place the
+`?identifier'  command  will give both the current and the original name
+of an  aliased  identifier.   If  your  installed  editor  is  `vi'  the
+`??identifier'  command  will  open  the  appropriate source file at the
+definition  of  the  identifier.   (There  is  also  a  command   `/find
+identifier'  which  is  like  `?identifier'  but will recognise an alias
+under its original name.)
+
+Every script behaves as though it contained the directive
+	%_i_n_c_l_u_d_e <stdenv>
+
+It is therefore illegal to %_i_n_c_l_u_d_e the standard environment explicitly,
+as  this  will  lead  to  huge number of name clashes (because it is now
+present twice).  As a consequence there is currently no way of  aliasing
+or  suppressing  the  names  in the standard environment.  (This will be
+fixed in the  future  by  providing  a  directive  for  suppressing  the
+implicit inclusion of <stdenv>.)
+------------------------------------------------------------------------
+
+%_e_x_p_o_r_t parts
+
+Any (correct, closed) Miranda script can be %included in another  script
+(there  is  no notion of a "module" as something with a different syntax
+from an ordinary script).  By default the names exported from  a  script
+are all those defined in it, at top level, but none of those acquired by
+a %_i_n_c_l_u_d_e of another file.  This behaviour can be modified  (either  to
+export  more  or  to  export less than the default) by placing a %_e_x_p_o_r_t
+directive in the script, specifying a list of `parts' to be exported  to
+an including file.
+
+The presence of a %_e_x_p_o_r_t directive in a script has  no  effect  on  its
+behaviour  when  it  is  the current script of a Miranda session - it is
+effective only when the script is %included in another.   A  script  may
+contain  at  most  one  %_e_x_p_o_r_t  directive.  This can be anywhere in the
+script, but to avoid nasty surprises it is advisable to  place  it  near
+the top.
+
+Each `part' listed in the export directive must be one of the following:
+ identifier (variable or typename)
+ fileid (in quotes, conventions as described above)
+ the symbol `+'
+ -identifier
+
+Notice  that  constructors need not (and cannot) be listed explicitly in
+an %_e_x_p_o_r_t  directive  -  if  you  export  an  algebraic  typename,  its
+constructors  are AUTOMATICALLY exported along with it.  The consequence
+of this is that you cannot use %_e_x_p_o_r_t to create an abstract data  type,
+by  "hiding information" about how an algebraic type was formed.  If you
+want to create an abstract data type you must use the _a_b_s_t_y_p_e  mechanism
+- see separate manual entry.
+
+If a fileid is present in the export list, this must be the  name  of  a
+file  which is %included in the exporting script, and the effect is that
+all the bindings acquired by that %_i_n_c_l_u_d_e  statement  (as  modified  by
+aliases  if  present)  are re-exported.  Allowing fileid's in the export
+list is merely a piece of shorthand, which can be used to avoid  writing
+out long lists of names.
+
+The symbol `+' is allowed in an export list as an abbreviation  for  all
+the top-level identifiers defined in the current script.
+
+The default %_e_x_p_o_r_t directive (i.e.  that which is assumed if no %_e_x_p_o_r_t
+statement is present) is therefore
+	%_e_x_p_o_r_t +
+This  will  export  all the top-level identifiers of the current script,
+but not those acquired by %_i_n_c_l_u_d_e directives.
+
+Finally, the notation `-identifier' is allowed  in  an  export  list  to
+indicate that this identifier NOT to be exported.  This is useful if you
+have used a fileid or the symbol `+' to abbreviate a list of names,  and
+wish to subtract some of these names from the final export list.
+
+An example - the following export statement exports  all  the  top-level
+identifiers of the current script, except `flooby'.
+	%_e_x_p_o_r_t + -flooby
+
+The order of appearance of  the  items  in  an  export  list  is  of  no
+significance,  and repetitions are ignored.  A negative occurrence of an
+identifier overrides any number of positive occurrences.
+
+It  is possible to find out what names are exported from a given Miranda
+script (or scripts) by calling, from UNIX, the command
+ `mira -exports files' (the extension `.m' will be added  to  each  file
+name if missing).  This will list (to stdout) for each file the exported
+names together with their types.
+------------------------------------------------------------------------
+
+_S_o_m_e_ _e_x_a_m_p_l_e_s
+
+(i) There are two scripts, called "liba.m" and "libb.m" say,  containing
+useful  definitions.   For  convenience  we  wish to combine them into a
+single larger library called say, "libc.m".  The following  text  inside
+the file "libc.m" will accomplish this.
+
+	%_e_x_p_o_r_t "liba" "libb"
+	%_i_n_c_l_u_d_e "liba"
+	%_i_n_c_l_u_d_e "libb"
+
+You  will  notice  that  when  "libc.m" is compiled, this does NOT cause
+recompilation  of  "liba.m"  and  "libb.m"  (see  section  on   separate
+compilation  -  the  compiler  is able to create an object code file for
+"libc.m", called "libc.x", by combining  "liba.x"  and  "libb.x"  in  an
+appropriate  way).   This  economy in recompilation effort is one reason
+why %_i_n_c_l_u_d_e is a better mechanism than the  simpler  textual  directive
+%_i_n_s_e_r_t (see section on compiler directives).
+
+We  could  if  we  wished  add  some  definitions  to "libc.m" - if the
+corresponding names are added to the %_e_x_p_o_r_t  statement  these  bindings
+will  then  be  exported  along  with those of the two sublibraries.  Of
+course if we don't add the names of the locally defined objects  to  the
+%_e_x_p_o_r_t  directive  they  will be `private definitions' of "libc.m", not
+visible to includors.
+
+Recall that if no  %_e_x_p_o_r_t  is  directive  is  present,  then  ONLY  the
+immediate  definitions  (if  any)  of  "libc.m"  will be exported.  So a
+script which contains only %_i_n_c_l_u_d_e directives and no %_e_x_p_o_r_t cannot  be
+usefully %included in another script (it is however perfectly acceptable
+as a current script).
+
+(ii) [More technical - omit on first reading]
+ Our second group of examples is chosen to bring out some  issues  which
+arise  when  exporting  types  between  scripts.   Suppose  we  have the
+following script, called "trees.m"
+	
+	tree * ::= NILT | NODE * (tree *) (tree *)
+	reflect :: tree *->tree *
+	reflect NILT = NILT
+	reflect (NODE a x y) = NODE a(reflect y)(reflect x)
+
+(a) If in another script we  write  `%_i_n_c_l_u_d_e  "trees"',  the  following
+bindings  will  be  imported  -  tree NILT NODE reflect.  Now suppose we
+modify the "trees.m" by placing in it the following directive - `%_e_x_p_o_r_t
+reflect'.  When the modified "trees.m" script is included in another, we
+will get the  following  error  message  from  the  compilation  of  the
+including script:
+
+	MISSING TYPENAME
+	the following type is needed but has no name in this scope:
+	'tree' of file "trees.m", needed by: reflect;
+	typecheck cannot proceed - compilation abandoned
+
+Explanation - it is illegal to export an identifier to a place where its
+type, or any part of its type, is unknown.  In this  situation  we  call
+reflect a `type-orphan' - it has lost one of its parents!
+
+(b)  Readoption  of a type-orphan (a more subtle example).  Assuming the
+"trees.m" script in  its  original  form  as  above,  we  construct  the
+following file "treelib.m"
+
+	%_e_x_p_o_r_t size
+	%_i_n_c_l_u_d_e "trees"
+	size :: tree *->num
+	size NILT = 0
+	size (NODE a x y) = 1+size x+size y
+
+If  we  %_i_n_c_l_u_d_e  the  above  script in another as it stands, we will of
+course get a missing typename diagnostic for `size' -  consider  however
+the following script
+
+	%_i_n_c_l_u_d_e "treelib"
+	%_i_n_c_l_u_d_e "trees"
+	... (etc)
+
+Everything  is  now  ok,  because  a  name  for size's missing parent is
+imported through another route (the  second  %_i_n_c_l_u_d_e  statement).   The
+Miranda  compiler  recognises  the  `tree'  type  imported by the second
+%_i_n_c_l_u_d_e as being the same one as that referred to  inside  "treelib.m",
+because  it  originates  (albeit  via  different  routes)  from the SAME
+SOURCEFILE.   A  `tree'  type  imported  from   a   different   original
+sourcefile,  even  if  it  had  the same constructor names with the same
+field types, would be recognised as a different type.
+
+[Note: the Miranda compiler is always able to recognise  when  the  same
+source  file  is  inherited  via  different  routes,  including in cases
+involving files with multiple pathnames due to the presence of (hard  or
+symblic) links.]
+
+[Further  note:  the lexical directive %_i_n_s_e_r_t (see compiler directives)
+should be regarded as making a _t_e_x_t_u_a_l_ _c_o_p_y of  the  material  from  the
+inserted  file  into  the file containing the %_i_n_s_e_r_t directive - if the
+text of a type definition (in ::= or abstype) is copied in this way, the
+compiler  will  regard  the %_i_n_s_e_r_t as having created a new type in each
+such case, not identical with that in the inserted file.]
+
+(c) Last example (typeclash).  Finally note that that it is illegal  for
+the  same  original  type  to be imported twice into the same scope even
+under different names.  Consider the following script
+
+	%_i_n_c_l_u_d_e "trees" shrub/tree Leaf/NILT Fork/NODE -reflect
+	%_i_n_c_l_u_d_e "trees"
+	... (etc)
+
+The first %_i_n_c_l_u_d_e taken on its own is perfectly ok - we  have  imported
+the `tree' type, and renamed everything in it by using aliases.  However
+we have also inherited the `tree' type under its original name, via  the
+second %_i_n_c_l_u_d_e.  The compiler will reject the script with the following
+message:
+
+	TYPECLASH - the following type is multiply named:
+	'tree' of file "trees.m", as: shrub,tree;
+	typecheck cannot proceed - compilation abandoned
+
+The rule that a type can have at most one name in a given scope  applies
+to both algebraic types and abstract types (it does not apply to synonym
+types, because these are not `real' types but mere  macro's  -  you  can
+have  any  number  of synonyms for `tree' in scope at the same time - as
+long as the underlying `real' type has a unique name).
+
+Typeclashes are illegal in Miranda in order to  preserve  the  following
+two  principles.  (i) In any given scope, each possible type must have a
+unique canonical form (obtained by expanding out synonyms, and  renaming
+generic  type  variables  in  a  standard  way).   (ii) Each object of a
+`printable type' must have,  in  any  given  scope,  a  unique  external
+representation  (ruling  out  multiply  named  constructors).  The first
+principle is necessary to the functioning of the typechecker, the second
+is demanded by the requirement that the function `_s_h_o_w' be referentially
+transparent.
+

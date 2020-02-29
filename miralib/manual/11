@@ -1,0 +1,86 @@
+_L_i_t_e_r_a_l_s
+
+Miranda has three  types  of  literal  constant  -  numerals,  character
+constants and string constants.
+
+Numerals are written in the following style
+	12  5237563  24.6  4.5e13  0.63e-6
+A numeral containing decimal point and/or scale factor (`.' or  `e')  is
+held  internally  as double precision (=64 bit) floating point, accuracy
+approximately 17 significant figures.  Integers are held in a  different
+internal representation, and have unbounded precision.
+
+The two kinds of number, integer and floating point, are  both  of  type
+`num',  as far as the type-checker is concerned, and can be freely mixed
+in calculations.  There is automatic conversion from  integer  to  float
+when  required,  but  not  in  the  opposite direction.  To convert from
+floating point to integer, use `entier' (see standard environment).
+
+Negative numbers are denoted by applying the prefix `-'  operator  to  a
+numeral, thus:
+	-12  -4.5e13
+but  note  that  the notation -12 is an expression, not a literal, so if
+you wish to apply a function to it, you must write f (-12), not  f  -12,
+which would be read as an attempt to subtract 12 from f.
+
+Integers can be written in hexadecimal  (base  16)  or  octal  (base  8)
+notation starting with 0x or 0o, e.g.  4095 can also be written as 0xfff
+or 0o7777.  Floating point  numbers  can  be  expressed  in  hexadecimal
+notation,  optionally  scaled  by  `p'  followed  by  a power of 2.  For
+example 0x1.0p-2 means 0.25.
+
+Character constants are written using single quotes, thus
+	'a'    '0'    '\n'
+The type `char' includes all Unicode* characters,  those  outside  ascii
+and Latin-1 can be expressed by numeric escape codes, see below.
+
+Note  that  the  functions  code::char->num,  decode::num->char  convert
+characters to and from their numeric codes.
+
+String constants are written using double quotes, thus
+	"hello dolly"    ""    "\n\n\n"
+
+Escape  conventions  in  character  and  string constants are as in `C',
+using the backslash character.
+	\'     single quote
+	\"     double quote
+	\\     the \ character itself
+	\a     alarm
+	\b     backspace
+	\f     formfeed
+	\n     newline
+	\r     carriage return
+	\t     tab
+	\v     vertical tab
+plus these numeric escapes which specify characters by code number.
+	\ddd     up to 3 decimal digits [0-9]
+        \xffff   up to 4 hex digits [0-9a-f]
+        \Xffffff up to 6 hex digits
+
+For escape codes to \999 you can use either decimal or hex, for  example
+the  DELETE  character  can  be  written as \127 or \x7f.  The \x and \X
+forms cover the whole range of Unicode values.  For example  '\x3b3'  is
+the Greek letter lower case gamma and '\x20ac' is the euro sign.  The \X
+form is unlikely to be needed but is provided for completeness.
+
+Specifying a character by numeric code in a string or char constant  has
+the  same  effect  as  including  it  literally, so for example "£" and
+"\163" are exactly the same string.
+
+Where a numeric escape code in a string is followed by a  literal  digit
+(or  hex  digit  for \x \X) the numeral can be padded with leading 0s to
+force the correct parse.  For example "\0078" is the alarm character  \7
+followed by a literal '8', while "\78" is "N".
+
+Literal newlines are allowed  inside  string  quotes  if  escaped  by  a
+preceding  backslash,  in  which  case the newline is ignored (as in C).
+Thus the string "hello dolly" can equally be written
+	"hello \
+dolly"
+
+A literal newline is not allowed inside character quotes.
+
+[* Unicode is an international standard providing numeric codes for the
+   symbols of practically all known human writing systems.  Unicode
+   points 0-127 coincide with ascii and 128-255 with Latin-1.]
+

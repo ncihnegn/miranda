@@ -1,0 +1,272 @@
+.TH MIRA 1 "November 2019"
+.SH NAME
+mira \- the Miranda(tm) functional programming system
+.SH SYNOPSIS
+.B mira
+[options]
+[file]
+.fi
+.SH DESCRIPTION
+Miranda is a functional programming system with lazy evaluation,
+polymorphic strong typing and function definition by pattern matching.
+.PP
+The \fBmira\fP program takes a single argument which is the name of
+a file of definitions (called a "script").  If no argument is given a
+default name "\fBscript.m\fP" is assumed.  The names of files
+containing miranda scripts must end in ".m" and \fBmira\fP will
+add this if missing. The specified file need not yet exist - in  this
+case  you  will  be  starting  a  Miranda  session with an empty current
+script.
+.PP
+The basic action of the Miranda system is to evaluate expressions in
+the environment established by the script, so in its simplest mode of
+use it behaves like a desk calculator.  Expressions are typed one per
+line, terminated by ENTER.
+."For example
+.".nf
+."      Miranda \fBproduct [1..40]
+."      815915283247897734345611269596115894272000000000\fP
+.".fi
+."There is a `standard environment' of predefined functions, such as
+."product, which are always in scope.
+The interpreter also accepts
+certain commands (mostly beginning with a `\fB/\fP' character) - these
+include \fB/help\fP or \fB/h\fP which prints a summary of the available
+commands, and \fB/man\fP or \fB/m\fP which gives access to the online
+manual of the Miranda system (menu driven and self explanatory). This
+documents all aspects of the Miranda language and system and should be
+consulted for further details.  It is also possible to access the
+Miranda system manual directly from a UNIX shell by the command \fBmira
+-man\fP.
+.SH OPTIONS
+.TP
+.B -lib pathname
+Specifies location of the miralib directory.  For default see \fBFILES\fP.
+Can also be done by setting environment variable \fBMIRALIB\fP.  The location
+of the miralib directory can be interrogated (but not changed) from
+within the miranda session by the command `/miralib'.
+.TP
+.B -gc
+Switches on a flag causing the garbage collector  to  print  information
+each  time  a  garbage  collection  takes  place.  This flag can also be
+switched on and off from within the  miranda  session  by  the  commands
+`/gc', `/nogc'.
+.TP
+.B -count
+Switches  on  a  flag  causing  statistics  to  be  printed  after  each
+expression  evaluation.   This flag can also be switched on and off from
+within the miranda session by the commands `/count', `/nocount'.
+.TP
+.B -list (-nolist)
+Switches on (off) a flag causing Miranda scripts to  be  listed  to  the
+screen  during  compilation.   This flag can also be switched on and off
+from within the miranda session by the commands `/list', `/nolist'.
+.TP
+.B -nostrictif
+Enables the compiler to accept old Miranda scripts with no `\fBif\fP'
+after the guard comma.
+.TP
+.B -hush (-nohush)
+The  miranda  system  decides  whether  or not to give prompts and other
+feedback by testing its standard input with `isatty'.  If  the  standard
+input  does not appear to be a terminal it assumes that prompts would be
+inappropriate, otherwise it gives them.  In either case  this  behaviour
+can be overriden by an explicit flag ("-hush" for silence, "-nohush" for
+prompts etc).  This switch is  also  available  from  within  a  miranda
+session by the commands `/hush', `/nohush'.
+.TP
+.B -dic SIZE
+Causes  the  dictionary, used by the compiler to store identifiers etc.,
+to be SIZE bytes (default 100k).  This can be interrogated (but not changed)
+from within the miranda session by the command `/dic'.
+.TP
+.B -heap SIZE
+Causes the heap to be SIZE cells (default 2500k).  This can
+changed within the miranda session by the command `/heap SIZE'.
+A cell is 9 bytes (2 words of 32 bits, and a tag field).
+.TP
+.B -editor prog
+Causes the resident editor (usual default `\fBvi\fP') to be \fBprog\fP
+instead.  This can also be done from within the miranda session by the
+command \fB/editor prog\fP.  Any occurrences of \fB!\fP and \fB%\fP in
+\fBprog\fP will be replaced by the line number and the name of the file
+to be edited, respectively.  For more detailed discussion see online manual
+subsection 31/5.
+.TP
+.B -UTF-8 (-noUTF-8)
+Assume the current locale is (is not) UTF-8 overriding environment vars
+(version 2.044 and later).
+.TP
+.B -stdenv
+Run mira without loading the standard environment.  Any script needing
+functions from <stdenv> will then have to explicitly %include <stdenv>,
+or define the required functions itself.  Not recommended as normal
+practise and may have unexpected consequences.
+.TP
+.B -object
+Used for debugging the compiler.  Modifies the  behaviour of ?identifier(s)
+to show the associated combinator code, which may or may not be comprehensible
+as there is no documentation other than the source code.
+.SH SPECIAL CALLS
+The following special calls to \fBmira\fP do not start a Miranda session
+but accomplish another purpose.
+.TP
+.B mira -man
+Enter Miranda online manual from the UNIX shell.  From within a
+Miranda session this is done by the command `/man' or `/m'.
+.TP
+.B mira -version
+Prints  version information.  This information can be obtained 
+within a Miranda session by the command `/version' or `/v'.
+.TP
+.B mira -V
+More detailed version information.  Can be obtained within a Miranda session
+by the command `/V'.
+.PP
+The remaining special calls are discussed in more detail in the online manual
+- we list them here for completeness.
+.TP
+.B mira -exec
+Special call permitting the use of miranda script as a stand-alone
+program. See online manual subsection 31/4 for details.
+.TP
+.B mira -exec2
+As \fB-exec\fP except that it redirects stderr to a log file.
+See online manual subsection 31/4 for details.
+.PP
+These three relate to separate compilation and Miranda's
+built in `make' facility.  See online manual section 27 (\fBthe library
+mechanism\fP):-
+.TP
+.B mira -make [files]
+Checks that all the miranda source files listed have up-to-date .x
+(intermediate code) files, triggering compilation processes if necessary.
+.TP
+.B mira -exports [files]
+Sends to stdout a list of the identifiers exported from the given
+miranda source files, together with their types (may force compilation
+if needed).
+.TP
+.B mira -sources [files]
+Send to stdout a list of all the Miranda source files on which the given
+source files directly or indirectly depend (via \fB%include\fP or \fB%insert\fP
+statements), excluding the standard environment \fB<stdenv>\fP.
+.TP
+.B mira -version
+Gives version information.  This information can also be  obtained  from
+within a Miranda session by the command `/version'.
+.TP
+.B mira -V
+More detailed version information.
+.SH ENVIRONMENT
+.TP
+.B MIRALIB
+Specifies the location of the miralib directory.  A \fB-lib\fP flag,
+if present, overrides this.  For default location see \fBFILES\fP.
+.TP
+.B EDITOR
+The  first time it is called (i.e. if no .mirarc file is present
+in the home directory or in miralib) the miranda  system  takes
+the  preferred editor from this environment variable - if
+not set `\fBvi\fP' is assumed.  Chosen editor can be changed from
+within a Miranda session by the command \fB/editor prog\fP.
+Any occurrences of \fB!\fP and \fB%\fP in \fBprog\fP will be replaced
+by the line number and the name of the file to be edited, respectively.
+For more detailed discussion see online manual subsection 31/5.
+.TP
+.B LC_CTYPE, LANG
+At startup (version 2.044 and later) the miranda system inspects \fBLC_TYPE\fP,
+or if that is empty \fBLANG\fP,  to
+determine  if  it  is running in a UTF-8 locale.  On Windows/Cygwin this
+information is taken from the \fBuser-default ANSI code page\fP.  An
+explicit \fB-UTF-8\fP or \fB-noUTF-8\fP flag, if present, overrides.
+.TP
+.B RECHECKMIRA
+If this is set to any non-empty string the Miranda system checks to see
+if any relevant source file has been updated, and performs any
+necessary recompilation, before each interaction with the user.  This is
+the appropriate behaviour if an editor window is being kept open during
+the Miranda session.  By default the check is performed only after `\fB/e\fP'
+commands and `\fB!\fP' escapes.  This can also be controlled from
+within a Miranda session by the commands `/recheck', `/norecheck'.
+.TP
+.B SHELL
+Determines what shell is  used  in  `!'  escapes. This  will  normally
+contain  the  name of the user's login shell.  If no \fBSHELL\fP is present in
+the environment, \fB/bin/sh\fP is assumed.
+.TP
+.B MIRAPROMPT
+Sets a string to be used as session prompt instead of the default prompt
+"Miranda " (version 2.044 and later).
+.TP
+.B NOSTRICTIF
+If this is set to any non-empty string Miranda accepts old scripts with no `\fBif\fP'
+after the guard comma.  Equivalent to calling mira with option
+\fB-nostrictif\fP.  Deprecated - you should put the `\fBif\fP's in.
+.PP
+The behaviour of the menudriver program that displays pages of the online
+manual can be modified using three environment variables:-
+.TP
+.B VIEWER
+The program used for displaying pages of the online manual.
+If  this  variable is not set the default is
+normally `\fBmore -d\fP' or (roughly equivalent) `\fBless -EX\fP'.
+If you set \fBVIEWER\fP to something, you may also need to set an  environment
+variable \fBRETURNTOMENU\fP.
+.TP
+.B RETURNTOMENU=YES 
+Prevents another prompt being given after displaying each section,
+causing instead an immediate return to contents page.  Appropriate if
+\fBVIEWER\fP is a program that pauses for input at end of file (e.g.
+`\fBless\fP').  It should be `\fBNO\fP' if \fBVIEWER\fP is a program that
+quits silently at end of file (e.g. `\fBmore -d\fP', `\fBless -EX\fP').
+.TP
+.B MENUVIEWER
+Can be used  to
+specify  the  program  used to display manual contents pages (default is
+usually `\fBcat\fP' or `\fBmore\fP').
+.PP
+To find the current settings of the online manual enter \fB???\fP
+to the "next selection" prompt of the manual system.
+.SH FILES
+.TP
+.B /usr/lib/miralib
+A directory containing files which \fBmira\fP needs - by default it
+looks for this at \fB/usr/lib/miralib\fP, then \fB/usr/local/lib/miralib\fP,
+and lastly at \fB./miralib\fP.  If it does not find a miralib of the
+same version number as itself in one of these places it exits with a panic
+message.  This behaviour can be overriden with the \fB-lib\fP option or
+by setting the environment variable \fBMIRALIB\fP.
+.TP
+.B $HOME/.mirarc
+Records most recent settings of heap size, dictionary size, editor
+and various flags which can be toggled during a session.  Written and
+read by \fBmira\fP using a peculiar format, not intended to be edited by
+humans.  The settings can be interrogated within a Miranda session
+by the command \fB/settings\fP or \fB/s\fP, and changed by various session
+commands (use \fB/aux\fP or \fB/a\fP to list these).  The only setting
+which cannot be changed in a session is dictionary
+size - this is done using the \fB-dic\fP option when mira is invoked.
+This rarely needs to be changed, however.
+.PP
+If a \fB.mirarc\fP is
+copied to \fBmiralib/.mirarc\fP the settings it records will be picked
+up by new users, who will not yet have their own \fB.mirarc\fP file.  This
+allows an administrator to change the default settings, e.g. to
+have a default editor other than \fBvi\fP.  The \fB$HOME/.mirarc\fP
+once created will override the global one, however, allowing users
+to make individual choices.
+.SH SEE ALSO
+.PP
+.B http://miranda.org.uk
+the Miranda home page.
+.PP
+D.A.Turner \fBAn Overview of Miranda\fP, SIGPLAN Notices, 21(12), December 1986.
+A convenient summary of the main features of Miranda.
+.PP
+\fBMiranda System Manual\fP.  Accessed
+by \fBmira -man\fP or \fB/man\fP from within a Miranda session.
+.SH COPYRIGHT
+The Miranda system  is  Copyright  (c)  Research  Software
+Limited 1985-2019. For distribution terms see the file "COPYING" included
+in the distribution.

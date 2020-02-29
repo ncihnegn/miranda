@@ -1,0 +1,81 @@
+_E_x_p_r_e_s_s_i_o_n_s
+
+In Miranda an expression denotes a  value.   Expressions  occur  in  two
+contexts,  but  have  the same(*) syntax in both situations.  First, the
+basic mode of operation of the Miranda command interpreter  is  that  it
+evaluates   expressions   typed   at  the  terminal  (these  are  called
+`command-level expressions').   Second,  expressions  are  an  important
+syntactic  component  of  _s_c_r_i_p_t_s  (because  scripts  are collections of
+definitions, and the right hand sides of  definitions  are  composed  of
+expressions).
+
+Expressions typed at the terminal are volatile - only by being made part
+of a script can an expression be saved for future use.
+
+An  expression  is  either  simple,  or  a  function  application, or an
+operator expression, or an operator.
+
+_A_ _s_i_m_p_l_e_ _e_x_p_r_e_s_s_i_o_n_ _i_s_ _o_n_e_ _o_f_ _t_h_e_ _f_o_l_l_o_w_i_n_g:
+
+Identifier: (see separate manual entry) these are of two kinds based  on
+the case of the initial letter
+ - variable e.g. `x' or `map'
+ - constructor e.g. `X' or `True'
+
+Literal, e.g. 136 or "fruit" (see separate manual entry)
+
+An operator section (see separate manual entry)
+
+The keyword `_s_h_o_w' or `_r_e_a_d_v_a_l_s' (see separate manual entries)
+
+A list, such as `[1,5,7,9]' or a `dotdot' list or a  list  comprehension
+(see manual entry on iterative expressions).
+
+A tuple, such as `(True,"green",37)'.  Tuples differ from lists in  that
+they  can  have  components  of mixed type.  They are always enclosed in
+round parentheses.  The empty tuple, which has no components, is written
+`()'.   Otherwise,  a tuple must have at least two components - there is
+no concept of a one-tuple.  Tuples  cannot  be  subscripted,  but  their
+components  can  be  extracted  by  pattern matching.  Since there is no
+concept of a one-tuple, the use of parentheses  for  grouping  does  not
+conflict with their use for tuple formation.
+
+Any expression enclosed in parentheses is a simple expression.
+
+_F_u_n_c_t_i_o_n_ _a_p_p_l_i_c_a_t_i_o_n
+ is denoted by juxtaposition, and is left associative, so e.g.
+	f a b
+
+denotes a curried function application  of  two  arguments.   (So  f  is
+really  a  function  of  one argument whose result is another function -
+thus `f a b' is actually parsed as `(f a) b' -  the  advantage  of  this
+arrangement  is  that  `f  a'  has  a  meaning in its own right, it is a
+partially applied version of f.)
+
+_O_p_e_r_a_t_o_r_ _e_x_p_r_e_s_s_i_o_n_s
+	e.g. `5*x-17'
+There  are  a  variety of infix and prefix operators, of various binding
+powers (see manual entry on operators).  Note that function  application
+is more binding than any operator.
+
+An  operator  on  its  own  can be used as the name of the corresponding
+function, as shown in the following examples
+	arith2_ops = [+,-,*,/,div,mod,^]
+	sum = foldr (+) 0
+
+both of which are legal definitions.  Note  that  when  an  operator  is
+passed as a parameter it needs to be parenthesised, to force the correct
+parse.  An ambiguity arises in the case of `-' which has two meanings as
+an  operator  (infix  and prefix) - the convention is that `-' occurring
+alone always refers to the infix (i.e. dyadic) case.  The name `neg'  is
+provided  for  the  unary  minus  function,  as  part  of  the  standard
+environment.
+
+A formal syntax for expressions can  be  found  in  the  manual  section
+called `Formal syntax of Miranda scripts'.
+
+(*) _N_o_t_e  There  is  one  exception  to  the  rule  that  command  level
+expressions  have  the  same  syntax as expressions inside scripts - the
+notation `$$', meaning the last expression evaluated, is allowed only in
+command level expressions.
+

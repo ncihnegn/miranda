@@ -1,0 +1,54 @@
+_I_n_p_u_t_/_o_u_t_p_u_t_ _o_f_ _b_i_n_a_r_y_ _d_a_t_a
+
+From version 2.044 Miranda stdenv.m includes a function
+	readb :: [char]->[char]
+and new sys-message constructors
+	Stdoutb     :: [char]->sys_message
+	Tofileb     :: [char]->[char]->sys_message
+	Appendfileb :: [char]->[char]->sys_message
+
+These  behave  similarly  to  (respectively)   read,   Stdout,   Tofile,
+Appendfile  but  are needed in a UTF-8 locale for reading/writing binary
+data (for further explanation see below).  In a non UTF-8 locale they do
+not  behave differently from read, Stdout etc but you might still prefer
+to use them for handling binary data, for portability reasons.
+
+The notation $:- is used for the binary version of the  standard  input.
+In  a  non UTF-8 locale $:- and $- will produce the same results.  It is
+an error to access both $:- and $- in the same evaluation.
+
+_E_x_p_l_a_n_a_t_i_o_n
+
+The locale of a  UNIX  process  is  a  collection  of  settings  in  the
+environment  which  specify, among other things, what character encoding
+is in use.  To see this information use `locale'  as  a  shell  command.
+The analogous concept in Windows is called a "code page".
+
+UTF-8 is a standard for encoding text from a wide variety  of  languages
+as  a  byte  stream,  in  which  ascii  characters  (codes  0..127)  are
+represented by themselves while  other  symbols  are  represented  by  a
+sequence of two or more bytes: a `multibyte character'.
+
+The Miranda type `char' consists of characters  in  the  range  (0..255)
+where  the  codes  above  127  represent  various  accented  letters etc
+according to the conventions of Latin-1 (i.e. ISO-8859-1, commonly  used
+for  West  European  languages).  There are national variants on Latin-1
+but since Miranda source, outside  comments  and  string  and  character
+constants, uses only ascii this does not normally cause a problem.
+
+In a UTF-8 locale: on reading string/character literals  or  text  files
+Miranda has to translate multibyte characters to the corresponding point
+in the Latin-1 range (128-255).  If the text does  not  conform  to  the
+rules  of  UTF-8,  or  includes  a  character not present in Latin-1, an
+"illegal character"  error  occurs.   On  output,  Miranda  strings  are
+translated back to UTF-8.
+
+If data being read/written is not text, but binary data  of  some  kind,
+translation  from/to  UTF-8  is not appropriate and could cause "illegal
+character" errors, and/or corruption of data.  Whence the need  for  the
+byte  oriented  I/O functions readb etc, which transfer data without any
+conversion from/to UTF-8.
+
+In a non UTF-8 locale read and readb, Tofile and Tofileb,  etc.  do  not
+differ in their results.
+
