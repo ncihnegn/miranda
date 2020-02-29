@@ -33,6 +33,8 @@ utf8.o: utf8.h Makefile
 cmbnms.o: cmbnms.c Makefile
 cmbnms.c combs.h: gencdecs
 	./gencdecs
+.host: hostinfo
+	./hostinfo > .host
 miralib/menudriver: menudriver.c Makefile
 	$(CC) $(CFLAGS) menudriver.c -o miralib/menudriver
 	chmod 755 miralib/menudriver$(EX)
@@ -43,10 +45,9 @@ tellcc:
 	@echo $(CC) $(CFLAGS)
 cleanup:
 #to be done on moving to a new host
-	-rm -rf *.o fdate miralib/menudriver mira$(EX)
+	-rm -rf *.o .host fdate miralib/menudriver mira$(EX)
 	./unprotect
 	-rm -f miralib/preludx miralib/stdenv.x miralib/ex/*.x #miralib/ex/*/*.x
-	./hostinfo > .host
 install:
 	make -s all
 	cp mira$(EX) /$(BIN)
