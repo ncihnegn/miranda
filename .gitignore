@@ -5,3 +5,16 @@ fdate
 mira
 miralib/menudriver
 miralib/preludx
+
+# CMake
+CMakeCache.txt
+CMakeFiles
+CMakeFiles
+cmake_install.cmake
+compile_commands.json
+
+# Ninja
+.ninja_deps
+.ninja_log
+build.ninja
+rules.ninja
