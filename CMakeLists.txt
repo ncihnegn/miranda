@@ -9,15 +9,38 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(READ "miralib/.version" VERS)
-execute_process(COMMAND "./revdate"
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE VDATE)
-string(STRIP ${VDATE} VDATE)
-execute_process(COMMAND "./quotehostinfo"
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  OUTPUT_VARIABLE HOST)
-string(STRIP ${HOST} HOST)
+execute_process(
+  COMMAND byacc -d rules.y
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  RESULT_VARIABLE byacc)
+if(byacc)
+  message(STATUS "byacc fails")
+endif()
+
+execute_process(
+  COMMAND cc fdate.c -o fdate
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  RESULT_VARIABLE fdate)
+if(${fdate})
+  message(STATUS "Fail to build fdate")
+endif()
+
+execute_process(COMMAND ./hostinfo WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                                                     OUTPUT_FILE .host)
+
+execute_process(
+  COMMAND ./quotehostinfo
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE host)
+string(STRIP ${host} host)
+
+execute_process(
+  COMMAND ./revdate
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE vdate)
+string(STRIP ${vdate} vdate)
+
+file(READ miralib/.version vers)
 
 add_executable(
   mira
@@ -33,5 +56,9 @@ add_executable(
   version.c
   y.tab.c)
 
-target_compile_definitions(mira PRIVATE VERS=${VERS} VDATE="${VDATE}" HOST=${HOST})
-target_compile_options(mira PRIVATE -w)
+target_compile_definitions(mira PRIVATE VERS=${vers} VDATE="${vdate}"
+                                        HOST=${host})
+target_compile_options(mira PRIVATE -O2)
+
+add_executable(menudriver menudriver.c)
+set_target_properties(menudriver PROPERTIES RUNTIME_OUTPUT_DIRECTORY miralib)
