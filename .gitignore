@@ -8,8 +8,8 @@ miralib/preludx
 
 # CMake
 CMakeCache.txt
-CMakeFiles
-CMakeFiles
+CMakeFiles/
+build/
 cmake_install.cmake
 compile_commands.json
 

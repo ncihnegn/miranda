@@ -2,7 +2,7 @@ all: mira miralib/menudriver exfiles
 #install paths relative to /
 #for linux, MacOS X, Cygwin:
 BIN=usr/bin
-LIB=usr/lib#beware no spaces after LIB
+LIB=usr/lib #beware no spaces after LIB
 MAN=usr/share/man/man1
 #for Solaris:
 #BIN=usr/local/bin

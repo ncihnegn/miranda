@@ -40,6 +40,9 @@ execute_process(
   OUTPUT_VARIABLE vdate)
 string(STRIP ${vdate} vdate)
 
+execute_process(
+  COMMAND ln -sf ${CMAKE_SOURCE_DIR}/miralib)
+
 file(READ miralib/.version vers)
 
 add_executable(
@@ -55,10 +58,13 @@ add_executable(
   utf8.c
   version.c
   y.tab.c)
-
 target_compile_definitions(mira PRIVATE VERS=${vers} VDATE="${vdate}"
                                         HOST=${host})
 target_compile_options(mira PRIVATE -O2)
 
 add_executable(menudriver menudriver.c)
 set_target_properties(menudriver PROPERTIES RUNTIME_OUTPUT_DIRECTORY miralib)
+
+add_custom_target(examples
+  COMMAND ./mira -make -lib miralib ex/*.m
+  DEPENDS mira)
