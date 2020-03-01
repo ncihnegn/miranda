@@ -9,6 +9,11 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+add_executable(just just.c)
+
+add_executable(menudriver menudriver.c)
+set_target_properties(menudriver PROPERTIES RUNTIME_OUTPUT_DIRECTORY miralib)
+
 execute_process(
   COMMAND byacc -d rules.y
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -61,9 +66,6 @@ add_executable(
 target_compile_definitions(mira PRIVATE VERS=${vers} VDATE="${vdate}"
                                         HOST=${host})
 target_compile_options(mira PRIVATE -O2)
-
-add_executable(menudriver menudriver.c)
-set_target_properties(menudriver PROPERTIES RUNTIME_OUTPUT_DIRECTORY miralib)
 
 add_custom_target(examples
   COMMAND ./mira -make -lib miralib ex/*.m

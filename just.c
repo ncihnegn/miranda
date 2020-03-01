@@ -76,6 +76,7 @@ static char buf[MAXBUF+2],*bp=buf;
 #define index(s,c) strchr(s,c)
 
 int linerr=0;
+void rjust(char*, int);
 
 justify(width,fp,fn)
 int width;
@@ -221,7 +222,7 @@ FILE *fp;
   return(c);
 }
 
-rjust(s,width)  /* print s justified to width */
+void rjust(s,width)  /* print s justified to width */
 char *s;
 int width;
 { int gap=width-strlen(s)+bs_cor(s),wc=words(s)-1;
