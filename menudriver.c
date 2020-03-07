@@ -230,7 +230,7 @@ char v[];
     { shell=getenv("SHELL");
       if(!shell)shell="/bin/sh"; }
   oldsig= signal(SIGINT,SIG_IGN);
-  if(pid=fork())
+  if((pid=fork()))
     { /* parent */
      if(pid==-1)
        perror("UNIX error - cannot create process");

@@ -203,7 +203,7 @@ word x,n;
   word carry=d>>DIGITWIDTH;
   word r = make(INT,d&MAXDIGIT,0);
   word *y = &rest(r);
-  while(x=rest(x))
+  while((x=rest(x)))
        d=n*digit(x)+carry,
        *y=make(INT,d&MAXDIGIT,0),
        y = &rest(*y),
@@ -218,7 +218,7 @@ word bigdiv(x,y)  /* may assume y~=0 */
 word x,y;
 { word s1,s2,q; 
   /* make x,y positive and remember signs */
-  if(s1=neg(y))y=make(INT,digit0(y),rest(y));
+  if((s1=neg(y)))y=make(INT,digit0(y),rest(y));
   if(neg(x))
     x=make(INT,digit0(x),rest(x)),s2=!s1; 
   else s2=s1;
@@ -242,7 +242,7 @@ word bigmod(x,y)  /* may assume y~=0 */
 word x,y;
 { word s1,s2;
   /* make x,y positive and remember signs */
-  if(s1=neg(y))y=make(INT,digit0(y),rest(y));
+  if((s1=neg(y)))y=make(INT,digit0(y),rest(y));
   if(neg(x))
     x=make(INT,digit0(x),rest(x)),s2=!s1; 
   else s2=s1;
@@ -269,7 +269,7 @@ word shortdiv(x,n) /* divide big x by single digit n returning big quotient
               /* may assume - x>=0,n>0 */
 word x,n;
 { word d=digit(x),s_rem,q=0;
-  while(x=rest(x))  /* reverse rest(x) into q */
+  while((x=rest(x)))  /* reverse rest(x) into q */
        q=make(INT,d,q),d=digit(x);  /* leaving most sig. digit in d */
   { word tmp;
     x=q; s_rem=d%n; d=d/n;
@@ -320,7 +320,7 @@ word x,y;
 word len(x) /* no of digits in big x */
 word x;
 { word n=1;
-  while(x=rest(x))n++;
+  while((x=rest(x)))n++;
   return(n);
 }
 
@@ -416,7 +416,7 @@ word x;
 { word n=0;
   double r=digit(x);
   if(neg(x)||bigzero(x))errno=EDOM,math_error("log");
-  while(x=rest(x))n++,r=digit(x)+r/IBASE;
+  while((x=rest(x)))n++,r=digit(x)+r/IBASE;
   return(log(r)+n*logIBASE);
 }
 
@@ -425,7 +425,7 @@ word x;
 { word n=0;
   double r=digit(x);
   if(neg(x)||bigzero(x))errno=EDOM,math_error("log10");
-  while(x=rest(x))n++,r=digit(x)+r/IBASE;
+  while((x=rest(x)))n++,r=digit(x)+r/IBASE;
   return(log10(r)+n*log10IBASE);
 }
 
@@ -553,7 +553,7 @@ word x;
       return(str_conv(dicp)); }
   sign=neg(x);
   x1=make(INT,digit0(x),0); /* reverse x into x1 */
-  while(x=rest(x))x1=make(INT,digit(x),x1);
+  while((x=rest(x)))x1=make(INT,digit(x),x1);
   x=x1;
   for(;;)
      { /* in situ division of (reversed order) x by PTEN */

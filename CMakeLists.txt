@@ -9,6 +9,11 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_program(clangtidy NAMES clang-tidy)
+if(${clangtidy})
+  set(CMAKE_C_CLANG_TIDY ${clangtidy} -fix)
+endif()
+
 add_executable(just just.c)
 
 add_executable(menudriver menudriver.c)

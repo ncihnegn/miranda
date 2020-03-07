@@ -165,7 +165,7 @@ char *argv[];
 /* used to indicate the base of the C stack for garbage collection purposes */
   verbosity=isatty(0);
 /*if(isatty(1))*/ setbuf(stdout,NULL); /* for unbuffered tty output */
-  if(home=getenv("HOME"))
+  if((home=getenv("HOME")))
     { strcpy(home_rc,home);
       if(strcmp(home_rc,"/")==0)home_rc[0]=0; /* root is special case */
       strcat(home_rc,"/.mirarc");
@@ -218,7 +218,7 @@ char *argv[];
         char *logfilname, *p=strrchr(argv[2],'/');
         FILE *fil=NULL;
         if(!p)p=argv[2]; /* p now holds last component of prog name */
-        if(logfilname=malloc((strlen(p)+9)))
+        if((logfilname=malloc((strlen(p)+9))))
           sprintf(logfilname,"miralog/%s",p),
           fil=fopen(logfilname,"a");
         else mallocfail("logfile name");
@@ -261,7 +261,7 @@ char *argv[];
     { editor=getenv("EDITOR");
       if(editor==NULL)editor=EDITOR;
       else strcpy(ebuf,editor),editor=ebuf,fixeditor(); }
-  if(prs=getenv("MIRAPROMPT"))promptstr=prs;
+  if((prs=getenv("MIRAPROMPT")))promptstr=prs;
   if(getenv("RECHECKMIRA")&&!rechecking)rechecking=1;
   if(getenv("NOSTRICTIF"))strictif=0;
   setupdic(); /* used by mkabsolute */
@@ -636,7 +636,7 @@ char* initscript;
 		       { shell=getenv("SHELL");
 		         if(!shell)shell="/bin/sh"; }
                      oldsig= signal(SIGINT,SIG_IGN);
-                     if(pid=fork())
+                     if((pid=fork()))
                        { /* parent */
                          if(pid==-1)
 	                   perror("UNIX error - cannot create process");
@@ -831,7 +831,7 @@ void command()
 		 return; }
    case 'e': if(is("e")||is("edit"))
                { char *mf=0;
-		 if(t=token())t=addextn(1,t);
+		 if((t=token()))t=addextn(1,t);
 		 else t=current_script;
                  checkeol;
 	         if(stat(t,&buf)) /* new file */
@@ -895,7 +895,7 @@ void command()
                  /* could get multiple copies of filename in dictionary
 		    - FIX LATER */
 		 if(t)errs=errline=0; /* moved here from reset() */
-		 if(t)if(strcmp(t,current_script)||files==NIL&&okdump(t))
+		 if(t)if(strcmp(t,current_script)||(files==NIL&&okdump(t)))
 			{ extern word CLASHES;
 			  CLASHES=NIL;  /* normally done by load_script */
 			  undump(t); /* does not always call load_script */
@@ -1040,7 +1040,7 @@ int line;
   char *p=ebuf,*q=editor;
   int tdone=0;
   if(line==0)line=1;  /* avoids warnings in some versions of vi */
-  while(*p++ = *q++)
+  while((*p++ = *q++))
      if(p[-1]=='\\'&&(q[0]=='!'||q[0]=='%'))p[-1]= *q++; else
      if(p[-1]=='!')
        (void)
@@ -1320,7 +1320,7 @@ char *t;
     files=append1(files,mkincludes(includees)),includees=NIL;
   ld_stuff=NIL;
   if(!SYNERR)
-    { if(verbosity||making&&!mkexports&&!mksources)
+    { if(verbosity||(making&&!mkexports&&!mksources))
 	printf("checking types in %s\n",t);
       checktypes();
       /* printf("typecheck complete\n"); /* DEBUG */ }
@@ -1540,7 +1540,7 @@ word includees;
 { extern word FBS,BAD_DUMP,CLASHES,exportfiles,exports,TORPHANS;
   word pid,result=NIL,tclashes=NIL;
   includees=reverse(includees); /* process in order of occurrence in script */
-  if(pid=fork())
+  if((pid=fork()))
     { /* parent */
       int status;
       if(pid==-1)
@@ -1584,7 +1584,7 @@ word includees;
        (void)strcpy(dicp+strlen(dicp)-1,obsuffix);
        if(!making) /* cannot interrupt load_script() */
 	 oldsig=signal(SIGINT,(sighandler)sigdefer);
-       if(f=fopen(dicp,"r"))
+       if((f=fopen(dicp,"r")))
 	 x=load_script(f,fn,hd[tl[hd[includees]]],tl[tl[hd[includees]]],0),
 	   fclose(f);
        ld_stuff=cons(x,ld_stuff);
@@ -1927,7 +1927,7 @@ word process()
   sighandler oldsig;
   oldsig = signal(SIGINT,SIG_IGN);
         /* do not let parent receive interrupts intended for child */
-  if(pid=fork())
+  if((pid=fork()))
   { /* parent */
     int status; /* see man 2 exit, wait, signal */
     if(pid== -1)

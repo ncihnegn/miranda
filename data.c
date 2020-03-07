@@ -162,7 +162,7 @@ void gc()       /*  the "garbage collector"  */
         exit(1); } /* if compiling should reset() instead - FIX LATER */
     else hnogcs=nogcs+1; }
   nogcs++;
-  while(*p1= -*p1)p1++;  /* make all tags -ve (= unwanted) */
+  while((*p1= -*p1))p1++;  /* make all tags -ve (= unwanted) */
   bases();
 /*if(atgc)printf("bases() done\n"); /* DEBUG */
   listp= ATOMLIMIT - 1;
@@ -387,7 +387,7 @@ word x;
 
 int is_char(x)
 word x;
-{ return 0<=x && x<256 || tag[x]==UNICODE; }
+{ return (0<=x && x<256) || tag[x]==UNICODE; }
 
 word sto_id(p1)
 char *p1;
@@ -1108,7 +1108,7 @@ char *t;
   (void)strcpy(obf,t);
   (void)strcpy(obf+strlen(obf)-1,obsuffix);
   if(!(f=fopen(obf,"r")))return(0);
-  if(getc(f)!=XVERSION||(ch=getc(f))&&ch!=1){ fclose(f);
+  if(getc(f)!=XVERSION||((ch=getc(f))&&ch!=1)){ fclose(f);
                                               return(0); }
   el=getword(f);
   /* now check this is right dump */

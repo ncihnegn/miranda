@@ -46,7 +46,7 @@ char *argv[];
     { sscanf(argv[1]+2,"%d",&tolerance);
       argc--; argv++;
     }else
-    if(isdigit(argv[1][1])||argv[1][1]=='-'&&isdigit(argv[1][2]))
+    if(isdigit(argv[1][1])||(argv[1][1]=='-'&&isdigit(argv[1][2])))
     { sscanf(argv[1]+1,"%d",&width);
       argc--; argv++;
     }
@@ -99,7 +99,7 @@ char *fn;
       { puts(bp=buf); continue; }
   /*otherwise perform justification up to next indented,blank or frozen line*/
     squeeze(buf);
-    while(bp-buf>(w=width+bs_cor(buf))||!isspace(c=peek(fp))&&c!=EOF&&c!='>')
+    while(bp-buf>(w=width+bs_cor(buf))||(!isspace(c=peek(fp))&&c!=EOF&&c!='>'))
       if(bp-buf<=w/*idth+bs_cor(buf)*/)
         { pad(); getln(fp,1); }
       else{ /* cut off as much as you can use */
@@ -113,13 +113,13 @@ char *fn;
                 putchar('-');  /* to signify forced word break */
                 putchar('\n');
               }
-            else { while(rp[-1]==' '||rp[-1]=='\b'&&rp[-2]=='_')
+            else { while(rp[-1]==' '||(rp[-1]=='\b'&&rp[-2]=='_'))
 	             rp -= rp[-1]==' '?1:2; /* find start of break */
 		   if(*rp=='_'&&rp[1]=='\b'&&rp[2]==' ')rp += 2;
 				     /* leave trace of underlined gap */
                    while((*rp==' '
-			  ||*rp=='_'&&rp[1]=='\b'&&rp[2]==' '
-			  ||*rp=='\b'&&rp[1]==' ')
+			  ||(*rp=='_'&&rp[1]=='\b'&&rp[2]==' ')
+			  ||(*rp=='\b'&&rp[1]==' '))
 			  &&rp<bp)*rp++ = '\0';  /* find end of break */
                    rjust(buf,width);
                  }
@@ -144,7 +144,7 @@ int crush;
   if(index(bp,'\t')&&indent(bp)<=THRESHOLD&&bp[0]!='>')
     { /* line contains tabs and is not frozen */
       char *p;
-      while(p=index(bp,'\t'))*p=' '; /* replace each tab by one space */
+      while((p=index(bp,'\t')))*p=' '; /* replace each tab by one space */
       /* WARNING - if THRESHOLD:=8 or greater, will need to change this to
 	 handle leading tabs more carefully, expanding each to right number
 	 of spaces, to preserve indentation */
@@ -270,7 +270,7 @@ words(s)  /* counts words (naively defined) in s */
 char *s;
 { int c=0;
   while(*s)
-  if(*s++!=' '&&s[-1]!='\b'&&(*s==' '|| *s=='_'&&s[1]=='\b'&&s[2]==' '))c++;
+  if(*s++!=' '&&s[-1]!='\b'&&(*s==' '|| (*s=='_'&&s[1]=='\b'&&s[2]==' ')))c++;
   return(c+1);
 }
 

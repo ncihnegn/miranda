@@ -1564,7 +1564,7 @@ word x;
 	     x=tl[x]; fprintf(f,","); }
       out_pattern(f,hd[x]); fprintf(f,","); out_pattern(f,tl[x]); 
       fprintf(f,")"); } else
-  if(tag[x]==INT&&neg(x)||tag[x]==DOUBLE&&get_dbl(x)<0)
+  if(tag[x]==INT&&neg(x)||(tag[x]==DOUBLE&&get_dbl(x)<0))
     { fprintf(f,"("); out(f,x); fprintf(f,")"); } /* -ve numbers */
   else
   out(f,x);  /* all other cases */

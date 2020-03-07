@@ -46,7 +46,7 @@ unicode fromUTF8(FILE *fil)
     { /* 2 bytes */
       if((nextch(c1))==EOF)err2(c0,c1); 
       if((c1&0xc0)!=0x80)err2(c0,c1);
-      return((c0&0x1f)<<6|c1&0x3f);
+      return((c0&0x1f)<<6|(c1&0x3f));
     }
   if((c0&0xf0)==0xe0)
     { /* 3 bytes */
@@ -54,7 +54,7 @@ unicode fromUTF8(FILE *fil)
       if((c1&0xc0)!=0x80)err2(c0,c1);
       if((nextch(c2))==EOF)err3(c0,c1,c2);
       if((c2&0xc0)!=0x80)err3(c0,c1,c2);
-      return((c0&0xf)<<12|(c1&0x3f)<<6|c2&0x3f);
+      return((c0&0xf)<<12|(c1&0x3f)<<6|(c2&0x3f));
     }
   if((c0&0xf8)==0xf0)
     { /* 4 bytes */
@@ -64,7 +64,7 @@ unicode fromUTF8(FILE *fil)
       if((c2&0xc0)!=0x80)err3(c0,c1,c2);
       if((nextch(c3))==EOF)err4(c0,c1,c2,c3);
       if((c3&0xc0)!=0x80)err4(c0,c1,c2,c3);
-      return((c0&7)<<18|(c1&0x3f)<<12|(c2&0x3f)<<6|c3&0x3f);
+      return((c0&7)<<18|(c1&0x3f)<<12|(c2&0x3f)<<6|(c3&0x3f));
     }
   err(c0);
 }
