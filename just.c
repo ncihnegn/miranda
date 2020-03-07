@@ -33,7 +33,8 @@
 int tolerance=3;
     /* the largest insert of extra spaces we are willing to tolerate
        in one place */
-
+void justify(int, FILE*, char*);
+int
 main(argc,argv)
 int argc;
 char *argv[];
@@ -77,14 +78,21 @@ static char buf[MAXBUF+2],*bp=buf;
 
 int linerr=0;
 void rjust(char*, int);
+void getln(FILE*, int);
+void squeeze(char*);
+int indent(char*);
+int bs_cor(char*);
+int peek(FILE*);
+void pad();
 
+void
 justify(width,fp,fn)
 int width;
 FILE *fp;
 char *fn;
 { int c=' ';  /* c initialised to anything != EOF */
   int worderr=0,w;
-  /*if(fp==stdin)setbuf(fp,NULL); /* to fix weird bug when "just" used in
+  /*if(fp==stdin)setbuf(fp,NULL); // to fix weird bug when "just" used in
                                    pipeline - DT 15/1/85 */
   /* note - above has disastrous effect on system time used, for large
      inputs, therefore switched off 19/2/87 - fortunately bug seems to be
@@ -95,7 +103,7 @@ char *fn;
   if(c=='\f')putchar('\f');else  /* formfeed counts as blank line */
   { ungetc(c,fp);
     getln(fp,0);
-    if(bp==buf||buf[0]=='>'||indent(buf)>THRESHOLD) /* blank or frozen line */
+    if(bp==buf||(buf[0]=='>'||indent(buf)>THRESHOLD)) /* blank or frozen line */
       { puts(bp=buf); continue; }
   /*otherwise perform justification up to next indented,blank or frozen line*/
     squeeze(buf);
@@ -137,6 +145,7 @@ char *fn;
            "just: warning -- %s contained disastrously long lines\n",fn);
 }
 
+void
 getln(fp,crush)
 FILE *fp;
 int crush;
@@ -178,6 +187,7 @@ int crush;
     squeeze(buf);
 }
 
+int
 indent(s)   /* size of white space at front of s */
 char *s;
 { int i=0;
@@ -189,11 +199,12 @@ char *s;
 
 #define istermch(c)  ((c)=='.'||(c)=='?'||(c)=='!')
 
+void
 squeeze(s)  /* remove superfluous blanks between words */
 char *s;
 { char *t;
   int eosen;
-  /* if(1){ bp=s+strlen(s); return; }  /* temporary measure to isolate bugs */
+  /* if(1){ bp=s+strlen(s); return; }  // temporary measure to isolate bugs */
   t = s = s + indent(s);
   for(;;)
   { while(*t&&*t!=' '&&!(*t=='_'&&t[1]=='\b'&&t[2]==' '))*s++ = *t++;
@@ -215,6 +226,7 @@ char *s;
   bp=s-1;
 }
 
+int
 peek(fp)
 FILE *fp;
 { int c=getc(fp);
@@ -222,12 +234,15 @@ FILE *fp;
   return(c);
 }
 
+int words(char*);
+void spaces(int, int);
+
 void rjust(s,width)  /* print s justified to width */
 char *s;
 int width;
 { int gap=width-strlen(s)+bs_cor(s),wc=words(s)-1;
   int i,r;
-  static leftist=0;  /* bias for odd spaces when r>0 */
+  static int leftist=0;  /* bias for odd spaces when r>0 */
   char *printword();
   if(wc)i=gap/wc,r=gap%wc;
   if(wc==0||i+(r>0)>tolerance){char *t=s+strlen(s);
@@ -253,6 +268,7 @@ int width;
   putchar('\n');
 }
 
+void
 pad()  /* insert space(s) if necessary when joining two lines */
 { if(bp[-1]!=' ')*bp++ = ' ';
   if(istermch(bp[-2]))*bp++ = ' '; else
@@ -260,12 +276,14 @@ pad()  /* insert space(s) if necessary when joining two lines */
      &&istermch(bp[-4]))*bp++ = '_', *bp++ = '\b', *bp++ = ' ';
 }
 
+void
 spaces(n,ul)
 int n,ul;
 { while(n--)if(ul)printf("_\b ");
 	    else putchar(' ');
 }
 
+int
 words(s)  /* counts words (naively defined) in s */
 char *s;
 { int c=0;
@@ -287,6 +305,7 @@ char *s;
   return(s);
 }
 
+int
 bs_cor(s) /* correction to length due to backspaces in string s */
 char *s;
 { int n=0;

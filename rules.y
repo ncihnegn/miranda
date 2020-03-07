@@ -146,7 +146,7 @@ word x;
 
 int isstring(x)
 word x;
-{ return(x==NILS||tag[x]==CONS&&is_char(hd[x]));
+{ return(x==NILS||(tag[x]==CONS&&is_char(hd[x])));
 }
 
 word compose(x) /* used in compiling 'cases' */
@@ -237,7 +237,7 @@ word add_prod(d,ps,hr)
 word d,ps,hr;
 { word p,n=dlhs(d);
   for(p=ps;p!=NIL;p=tl[p])
-  if(dlhs(hd[p])==n)
+  if(dlhs(hd[p])==n){
      if(dtyp(d)==undef_t&&dval(hd[p])==UNDEF)
        { dval(hd[p])=dval(d); return(ps); } else
      if(dtyp(d)!=undef_t&&dtyp(hd[p])==undef_t)
@@ -249,7 +249,7 @@ word d,ps,hr;
                echoing?"\n":"",
                dtyp(d)==undef_t?"definitions":"specifications",
                get_id(n)),
-       acterror();
+       acterror();}
   return(cons(d,ps));
 }
 /* clumsy - this algorithm is quadratic in number of prodns - fix later */
@@ -408,7 +408,7 @@ entity:  /* the entity to be parsed is either a definition script or an
             { int pid;/* launch a concurrent process to perform task */
               sighandler oldsig;
               oldsig=signal(SIGINT,SIG_IGN); /* ignore interrupts */
-              if(pid=fork())
+              if((pid=fork()))
                 { /* "parent" */
                   if(pid==-1)perror("cannot create process");
                   else printf("process %d\n",pid);
@@ -429,7 +429,7 @@ entity:  /* the entity to be parsed is either a definition script or an
                 /* formerly used dup2, but not present in system V */
                 fclose(stdin);
                 /* setbuf(stdout,NIL); 
-		/* not safe to change buffering of stream already in use */
+		// not safe to change buffering of stream already in use */
 		/* freopen would have reset the buffering automatically */
                 lastexp = NIL;  /* what else should we set to NIL? */
                 /*atcount= 1; */
@@ -1587,7 +1587,7 @@ term:
     count_factors
         = { word n=0,f=$1,rule=Void;
                          /* default value of a production is () */
-                         /* rule=mkgvar(sreds); /* formerly last symbol */
+                         /* rule=mkgvar(sreds); // formerly last symbol */
             if(f!=NIL&&hd[f]==G_END)sreds++;
             if(ihlist)rule=ih_abstr(rule);
             while(n<sreds)rule=lambda(mkgvar(++n),rule);

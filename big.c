@@ -42,7 +42,7 @@ word sto_int(i)  /* store C long long as mira bigint */
 long long i;
 { word s,x;
   if(i<0)s=SIGNBIT,i= -i; else s=0;
-  x=make(INT,s|i&MAXDIGIT,0);
+  x=make(INT,s|(i&MAXDIGIT),0);
   if(i>>=DIGITWIDTH)
     { word *p = &rest(x);
       *p=make(INT,i&MAXDIGIT,0),p= &rest(*p);
@@ -84,7 +84,7 @@ word big_plus(x,y,signbit) /* ignore input signs, treat x,y as positive */
 word x,y; int signbit;
 { word d=digit0(x)+digit0(y);
   word carry = ((d&IBASE)!=0);
-  word r = make(INT,signbit|d&MAXDIGIT,0); /* result */
+  word r = make(INT,signbit|(d&MAXDIGIT),0); /* result */
   word *z = &rest(r); /* pointer to rest of result */
   x = rest(x); y = rest(y);
   while(x&&y) /* this loop has been unwrapped once, see above */
@@ -165,8 +165,8 @@ word x,y;
   r=digit0(x)-digit0(y);
   for(;;)
      { x=rest(x); y=rest(y);
-       if(!x)if(y)return(s?1:-1);
-             else return(s?-r:r);
+       if(!x){if(y)return(s?1:-1);
+         else return(s?-r:r);}
        if(!y)return(s?-1:1);
        d=digit(x)-digit(y);
        if(d)r=d; }
@@ -377,10 +377,10 @@ word x;
   long double b=1.0L, r=digit0(x);
   x = rest(x);
   while(x)b=b*IBASE,r=r+b*digit(x),x=rest(x);
-/*printf("bigtoldbl returns %Le\n",s?-r:r); /* DEBUG
+//printf("bigtoldbl returns %Le\n",s?-r:r); // DEBUG
   if(s)return(-r);
   return(r);
-} /* not compatible with std=c90, lib fns eg sqrtl broken */
+} // not compatible with std=c90, lib fns eg sqrtl broken */
 
 word dbltobig(x)  /* entier */
 double x;
@@ -388,7 +388,7 @@ double x;
   word r=make(INT,0,0);
   word *p = &r;
   double y= floor(x);
-/*if(fabs(y-x+1.0)<1e-9)y += 1.0; /* trick due to Peter Bartke, see note */
+/*if(fabs(y-x+1.0)<1e-9)y += 1.0; // trick due to Peter Bartke, see note */
   for(y=fabs(y);;)
      { double n = fmod(y,(double)IBASE);
        digit(*p) = (word)n;
@@ -585,11 +585,11 @@ word x;
          unsigned long long hold=0;
          while(count-- && x) /* calculate value of (upto) 4 bignum digits */
               hold=hold+factor*digit0(x),
-              /* printf("::%llx\n",hold), /* DEBUG */
+              /* printf("::%llx\n",hold), // DEBUG */
               factor<<=15,
               x=rest(x);
          sprintf(dicp,"%.15llx",hold); /* 15 hex digits = 60 bits */
-         /* printf(":::%s\n",dicp); /* DEBUG */
+         /* printf(":::%s\n",dicp); // DEBUG */
          char *q=dicp+15;
          while(--q>=dicp)r = cons(*q,r);
        }
@@ -650,7 +650,7 @@ char *s;
 }
 
 #define destrev(x,y,z)  while(x)z=x,x=rest(x),rest(z)=y,y=z;
-/* destructively reverse x into y using z as temp */
+// destructively reverse x into y using z as temp */
 
 /* END OF MIRANDA INTEGER PACKAGE */
 

@@ -61,7 +61,7 @@ void setupdic()
 }
 
 /* this allows ~login convention in filenames */
-/* #define okgetpwnam
+// #define okgetpwnam
 /* suppress 26.5.06 getpwnam causes runtime error when statically linked (Linux) */
 
 #ifdef okgetpwnam
@@ -107,9 +107,9 @@ char *token() /* lex analyser for command language (very simple) */
 #endif
   while(!isspace(ch)&&ch!=EOF)
        { *dicq++ = ch; 
-	 if(ch=='%')
+     if(ch=='%') {
 	 if(dicq[-2]=='\\')(--dicq)[-1]='%';
-	 else dicq--,(void)strcpy(dicq,current_script),dicq+=strlen(dicq);
+	 else dicq--,(void)strcpy(dicq,current_script),dicq+=strlen(dicq);}
 	 ch=getchar(); }
 #ifdef SPACEINFILENAMES
   else { word closeq= ch=='<'?'>':'"';  /* this branch added 9.5.06          */
@@ -132,7 +132,7 @@ char *s;
 { extern char *miralib;
   extern char linebuf[];
   word n=strlen(s);
-  /* printf("addextn(%s)\n",s); /* DEBUG */
+  /* printf("addextn(%s)\n",s); // DEBUG */
   if(s[0]=='<'&&s[n-1]=='>')
     { static int miralen=0; /* code to handle quotes added 21/1/87 */
       if(!miralen)miralen=strlen(miralib);
@@ -163,7 +163,7 @@ char *s;
   (void)strcpy(dicq,".m");
   dicq += 3;
   ovflocheck;
-  /* printf("return(%s)\n",dicp); /* DEBUG */
+  /* printf("return(%s)\n",dicp); // DEBUG */
   return(dicp);
 } /* NB - call keep(dicp) if the result is to be retained */
 
@@ -204,9 +204,9 @@ int getch() /* keeps track of current position in the variable "col"(column) */
       if(!commandmode&&ch!=EOF)line_no++; }
   if(echoing&&ch!=EOF)
     { putchar(ch);
-      if(ch=='\n'&&!literate)
+      if(ch=='\n'&&!literate){
 	if(litmain)putchar('>'),spaces(lverge);
-	else spaces(lverge);
+	else spaces(lverge);}
     }
   if(ch=='\t')col= ((col-lverge)/8 + 1)*8+lverge;
   else col++;
@@ -281,7 +281,7 @@ int getlitch()
                 char hold[8];
                 ch = c;
                 int count=0;
-             /* while(ch=='0'&&isxdigit(peekch()))ch=getch(); /* H-lose leading 0s */
+             /* while(ch=='0'&&isxdigit(peekch()))ch=getch(); // H-lose leading 0s */
                 while(isxdigit(ch)&&count<N)
                      hold[count++]=ch,ch=getch();
                 /* read upto N hex digits */
@@ -294,14 +294,14 @@ int getlitch()
     default: if('0'<=ch&&ch<='9')
              { word n=ch-'0',count=1,N=3; /* N=8 for Haskell escape rules */
                ch = c;
-            /* while(ch=='0'&&isdigit(peekch()))ch=getch(); /* H-lose leading 0s */
+            /* while(ch=='0'&&isdigit(peekch()))ch=getch(); // H-lose leading 0s */
                while(isdigit(ch)&&count<N)
                /* read upto N digits */
                { n = 10*n+ch-'0';
                  count++;
                  ch = getch(); }
                c = ch;
-               return /* n>UMAX?-4:  /* H \decimal out of range */
+               return /* n>UMAX?-4:  // H \decimal out of range */
                       sto_char(n); }
              if(ch=='\''||ch=='"'||ch=='\\'||ch=='`')return(ch);  /* see note */
              if(ch=='&')return -7; /* Haskell null escape, accept silently */
@@ -332,12 +332,12 @@ char *rdline()  /* used by the "!" command -- see steer.c */
 	while((ch=getchar())!='\n'&&ch!=EOF);
 	return(NULL);
       } else
-    if(p[-1]=='%')
+    if(p[-1]=='%') {
     if(p>linebuf+1&&p[-2]=='\\')(--p)[-1]='%'; else
       { (void)strncpy(p-1,current_script,linebuf+BUFSIZE-p);
         p = linebuf+strlen(linebuf);
         expansion = 1;
-      }
+      }}
   *p = '\0';
   if(expansion)printf("!%s",linebuf);
   return(linebuf); }
@@ -374,16 +374,16 @@ word yylex()         /* called by YACC to get the next symbol */
   if(SYNERR)return(END); /* tell YACC to go home */
   layout();
   if(c=='\n') /* can only occur in command mode */
-/*  if(magic){ commandmode=0; /* expression just read, now script */
-/*	       line_no=2;
-/*	       return(c); } else /* no longer relevant 26.11.2019 */
+/*  if(magic){ commandmode=0; // expression just read, now script */
+//	       line_no=2;
+/*	       return(c); } else // no longer relevant 26.11.2019 */
     return(END);
-  if(col<lmargin)
+  if(col<lmargin) {
   if(c=='='&&(margstack==NIL||col>=hd[margstack]))/* && part fixes utah.bug*/
     { c = getch();
       return(ELSEQ);    /* ELSEQ means "OFFSIDE =" */
     }
-  else return(OFFSIDE);
+  else return(OFFSIDE);}
   if(c==';') /* fixes utah2.bug */
     { c=getch(); layout();
       if(c=='='&&(margstack==NIL||col>=hd[margstack]))
@@ -393,7 +393,7 @@ word yylex()         /* called by YACC to get the next symbol */
       else return(';');
     }
   if(
-  /* c=='_'&&okid(peekch()) || /* _id/_ID as lowercase id */
+  /* c=='_'&&okid(peekch()) || // _id/_ID as lowercase id */
      isalpha(c)){ kollect(okid);
                    if(inlex==1){ layout();
                                  yylval=name();
@@ -436,10 +436,10 @@ word yylex()         /* called by YACC to get the next symbol */
   { string();
     if(yylval==NIL)yylval=NILS;  /* to help typechecker! */
     return(CONST); }
-  if(inbnf==2) /* fiddle to offside rule in grammars */
+  if(inbnf==2){/* fiddle to offside rule in grammars */
     if(c=='[')brct++; else if(c==']')brct--; else
     if(c=='|'&&brct==0)
-      return(OFFSIDE);
+      return(OFFSIDE);}
   if(c==EOF)
   { if(tl[fileq]==NIL&&margstack!=NIL)return(OFFSIDE); /* to fix dtbug */
     fclose((FILE *)hd[hd[fileq]]);
@@ -516,7 +516,7 @@ word yylex()         /* called by YACC to get the next symbol */
 	      }
 	    return(lastc);
   case '$': if(
-            /* c=='_'&&okid(peekch())|| /* _id/_ID as id */
+            /* c=='_'&&okid(peekch())|| // _id/_ID as id */
               isalpha(c))
               { int t;
                 kollect(okid);
@@ -547,7 +547,7 @@ word yylex()         /* called by YACC to get the next symbol */
                   {c=getch(); yylval=common_stdinb; return(CONST); }}} /* $:- */
             if(c=='+')
               { /* if(!(commandmode&&compiling||magic))
-	          syntax("unexpected symbol $+\n"); else /* disallow in scripts */
+	          syntax("unexpected symbol $+\n"); else // disallow in scripts */
 		if(!compiling)
 	          syntax("unexpected symbol $+\n"); else
 		{ c=getch();
@@ -845,9 +845,9 @@ word directive() /* these are of the form "%identifier" */
 		    col=lverge=holdcol;
                     if(echoing)
 		      { putchar('\n'); 
-			if(!literate)
+            if(!literate){
 		          if(litmain)putchar('>'),spaces(holdcol);
-			  else spaces(holdcol); }
+			  else spaces(holdcol); }}
                     c = getch(); } /* used to precede previous cmd when echo
 				      was delayed by one char, see getch() */
                 else { int toomany=(insertdepth>=12);
@@ -1170,7 +1170,7 @@ int charclass()
 void reset_lex()  /* called after an error */
 { extern word errs,errline;
   extern char *current_script;
-  /*printf("reset_lex()\n"); /* DEBUG */
+  /*printf("reset_lex()\n"); // DEBUG */
   if(!commandmode)
     { if(!errs)errs=fileinfo(get_fil(current_file),line_no);
       /* convention, if errs set contains location of error, otherwise pick up
@@ -1196,7 +1196,7 @@ void reset_lex()  /* called after an error */
 void reset_state()  /* reset all global variables used by compiler */
 { extern word TABSTRS,SGC,newtyps,algshfns,showchain,inexplist,sreds,
 	     rv_script,idsused;
-  /* printf("reset_state()\n"); /* DEBUG */
+  /* printf("reset_state()\n"); // DEBUG */
   if(commandmode)
     while(c!='\n'&&c!=EOF)c=getc(s_in);  /* no echo */
   while(fileq!=NIL)fclose((FILE *)hd[hd[fileq]]),fileq=tl[fileq];
@@ -1213,7 +1213,7 @@ void reset_state()  /* reset all global variables used by compiler */
   c=' ';
   line_no=0;
   litmain=literate=0;
-  /* printf("exit reset_state()\n"); /* DEBUG */
+  /* printf("exit reset_state()\n"); // DEBUG */
 }
 
 /* end of MIRANDA LEX ANALYSER */

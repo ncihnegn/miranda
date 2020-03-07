@@ -28,7 +28,7 @@ long nogcs=0;
 extern int atgc,loading; /* flags, set in steer.c */
 
 word *dstack=0,*stackp,*dlim;
-/* stackp=dstack; /* if load_script made interruptible, add to reset */
+/* stackp=dstack; // if load_script made interruptible, add to reset */
 
 #define poschar(c) !(negchar((c)-1))
 #define negchar(c) (c&128)
@@ -94,10 +94,10 @@ unsigned char t; word x,y;
 { while(poschar(tag[++listp]));
        /* find next cell with zero or negative tag (=unwanted) */
   if(listp==TOP)
-    { if(SPACE!=SPACELIMIT)
+    { if(SPACE!=SPACELIMIT){
       if(!compiling)SPACE=SPACELIMIT; else
       if(claims<=SPACE/4&&nogcs>1)
-        { /* during compilation we raise false ceiling whenever residency 
+        { /* during compilation we raise false ceiling whenever residency
 	     reaches 75% on 2 successive gc's */
           static word wait=0;
 	  word sp=SPACE;
@@ -107,7 +107,7 @@ unsigned char t; word x,y;
           if(SPACE>SPACELIMIT)SPACE=SPACELIMIT;
           if(atgc&&SPACE>sp)
 	    printf( "\n<<increase heap from %ld to %ld>>\n",sp,SPACE);
-        }
+        }}
       if(listp==TOP)
         {
 #if defined ORION105
@@ -164,13 +164,13 @@ void gc()       /*  the "garbage collector"  */
   nogcs++;
   while((*p1= -*p1))p1++;  /* make all tags -ve (= unwanted) */
   bases();
-/*if(atgc)printf("bases() done\n"); /* DEBUG */
+/*if(atgc)printf("bases() done\n"); // DEBUG */
   listp= ATOMLIMIT - 1;
   cellcount+= claims;
   claims= 0;
   collecting=0;
 }
-/* int Icount; /* DEBUG */
+/* int Icount; // DEBUG */
 
 void gcpatch() /* called when gc interrupted - see reset in steer.c */
 /* must not allocate any cells between calling this and next gc() */
@@ -200,7 +200,7 @@ void bases()  /*  marks everthing that must be saved  */
              exports,internals, freeids,tlost,detrop,rfl,bereaved,ld_stuff;
   extern word CLASHES,ALIASES,SUPPRESSED,TSUPPRESSED,DETROP,MISSING,fnts,FBS;
   extern word outfilq,waiting;
-  /* Icount=0; /* DEBUG */
+  /* Icount=0; // DEBUG */
   p= (word *)&p;
 /* we follow everything on the C stack that looks like  a  pointer  into
 list space. This is failsafe in that the worst that can happen,if e.g. a
@@ -304,14 +304,14 @@ collector will collect less garbage than it could have done */
     mark(tvmap);
     mark(localtvmap);
     for(i=0;i<hashsize;i++)mark(SUBST[i]); }
-/*  if(atgc)printf("<<%d I-nodes>>\n",Icount); /* DEBUG */
+/*  if(atgc)printf("<<%d I-nodes>>\n",Icount); // DEBUG */
 }
 
 void mark(x)   /* a marked cell is distinguished by having a +ve "tag" */
 word x;
 { x&= ~tlptrbits; /* x may be a `reversed pointer' (see reduce.c) */
   while(isptr(x)&&negchar(tag[x]))
-  { /*if(hd[x]==I)Icount++; /* DEBUG */
+  { /*if(hd[x]==I)Icount++; // DEBUG */
     if((tag[x]= -tag[x])<INT)return;
     if(tag[x]>STRCONS)mark(hd[x]);
     x= tl[x]&~tlptrbits; }
@@ -624,7 +624,7 @@ FILE *f;
 void dump_ob(x,f)  /* write combinatory expression x to file f */
 word x;
 FILE *f;
-{ /* printob("dumping: ",x); /* DEBUG */
+{ /* printob("dumping: ",x); // DEBUG */
   switch(tag[x])
   { case ATOM: if(x<128)putc(x,f); else
                if(x>=384)putc(x-256,f); else
@@ -761,7 +761,7 @@ word aliases,params,main;
 	 ovflocheck;
          ch=getword(f); /* mtime */
 	 s=getc(f); /* share bit */
-         /*printf("loading: %s(%d)\n",dicp,ch); /* DEBUG */
+         /*printf("loading: %s(%d)\n",dicp,ch); // DEBUG */
 	 if(files==NIL) /* is this the right dump? */
 	 if(strcmp(dicp,src))
 	   { BAD_DUMP=1;
@@ -900,7 +900,7 @@ void dgrow()
   if(dstack==NULL)mallocfail("dstack");
   dlim=dstack+2*(dlim-hold);
   stackp += dstack-hold;
-  /*printf("dsize=%d\n",dlim-dstack);  /* DEBUG */
+  /*printf("dsize=%d\n",dlim-dstack);  // DEBUG */
 }
 
 word load_defs(f)  /* load a sequence of definitions from file f, terminated
@@ -989,7 +989,7 @@ FILE *f;
 		   continue;
       case DEF_X: switch(stackp-dstack){
 		  case 0: /* defs delimiter */
-		    { /*printlist("contents: ",defs); /* DEBUG */
+		    { /*printlist("contents: ",defs); // DEBUG */
 		      return(reverse(defs)); }
 		  case 1: /* ob delimiter */
 		    { return(*--stackp); }
@@ -999,7 +999,7 @@ FILE *f;
 		      defs=cons(ch,defs); /* NB defs now includes pnames */
 		      continue; }
 		  case 4:
-		  if(tag[stackp[-1]]!=ID)
+		  if(tag[stackp[-1]]!=ID){
 		    if(stackp[-1]==NIL){ stackp -= 4; continue; } /* FIX1 */
 		    else { /* id aliased to pname */
 			   word akap;
@@ -1021,7 +1021,7 @@ FILE *f;
 			     /*if(t_class(ch)==algebraic_t)
 			     CSUPPRESS=append1(CSUPPRESS,t_info(ch));
 	                     t_info(ch)= cons(akap,fileinfo(CFN,0));
-	                     /* assists identifn of dangling typerefs 
+	                     // assists identifn of dangling typerefs
 		                see privatise() in steer.c */ }else
 			   if(pn_val(ch)==UNDEF)
 			     { /* special kludge for undefined names */
@@ -1038,7 +1038,7 @@ FILE *f;
 				  see reduction rule for DATAPAIR */
 			     }
 		           defs=cons(ch,defs);
-			   continue; }
+			   continue; }}
 		  if(
 		    id_type(stackp[-1])!=new_t&& /* FIX1 */
 		    (id_type(stackp[-1])!=undef_t||
@@ -1058,18 +1058,18 @@ FILE *f;
 			  tl[tl[hd[hd[a]]]]= *--stackp; /* value */
 			  continue; }
 		      /*if(strcmp(CFN,hd[get_here(stackp[-1])]))
-			/* EXPT (ignore clash if from same original file) */
+			// EXPT (ignore clash if from same original file) */
 		      CLASHES=add1(stackp[-1],CLASHES);
 		      stackp-=4; }
 		  else
 		      defs=cons(*--stackp,defs),
-                      /*printf("%s undumped\n",get_id(hd[defs])), /* DEBUG */
+                      /*printf("%s undumped\n",get_id(hd[defs])), // DEBUG */
 		      id_who(hd[defs])= *--stackp,
 		      id_type(hd[defs])= *--stackp,
 		      id_val(hd[defs])= *--stackp;
 		  continue;
 		  default:
-		    { /* printf("badly formed def in dump\n"); /* DEBUG */
+		    { /* printf("badly formed def in dump\n"); // DEBUG */
 		      BAD_DUMP=3; return(defs); } /* should unsetids */
 		  } /* of switch */
       case AP_X: ch = *--stackp;

@@ -96,13 +96,13 @@ L:if(TYPERRS)
       SYNERR=1;
       return; }
   if(freeids!=NIL)redtfr(freeids);
-  /* printgraph("dependency analysis:",R); /* for debugging */
+  /* printgraph("dependency analysis:",R); // for debugging */
   genshfns();
   if(fnts!=NIL)genbnft();
   R=msc(R);
-  /* printgraph("strong components:",R); /* for debugging */
+  /* printgraph("strong components:",R); // for debugging */
   s=tsort(R);
-  /* printlist("topological sort:",s); /* for debugging */
+  /* printlist("topological sort:",s); // for debugging */
   NT=R=NIL; /* must be invariant across the call */
   while(s!=NIL)infer_type(hd[s]),s=tl[s];
   checkfbs();
@@ -135,7 +135,7 @@ void comp_deps(n) /* adds to R an entry of the form cons(n,RHS) where n is an
    form, as it goes */
 word n;
 { word rhs=NIL,r;
-  /* printf("comp_deps(%s)\n",get_id(n)); /* DEBUG */
+  /* printf("comp_deps(%s)\n",get_id(n)); // DEBUG */
   if(id_type(n)==type_t)
     { if(t_class(n)==algebraic_t)
         { r=t_info(n);
@@ -146,11 +146,11 @@ word n;
         }
       else if(t_class(n)==synonym_t)
 	     current_id=n,t_info(n)=meta_tcheck(t_info(n));
-      else if(t_class(n)==abstract_t)
+      else if(t_class(n)==abstract_t){
 	   if(t_info(n)==undef_t)
 	     printf("error: script contains no binding for abstract typename\
  \"%s\"\n",get_id(n)),sayhere(id_who(n),1),TYPERRS++;
-	   else current_id=n,t_info(n)=meta_tcheck(t_info(n));
+	   else current_id=n,t_info(n)=meta_tcheck(t_info(n));}
 	   /* placeholder types - no action */
       current_id=0;
       return; }
@@ -299,7 +299,7 @@ L:if(t_class(tn)!=synonym_t)return(t);
         sayhere(id_who(tn),1);
       longjmp(env1,1); /* fatal error - give up */
 /*    t_class(tn)=algebraic_t;t_info(tn)=NIL;
-          /* to make sure we dont fall in here again! */
+          // to make sure we dont fall in here again! */
       return(t); }
   meta_pending=cons(tn,meta_pending);
   tn=NIL;
@@ -396,10 +396,10 @@ void mcheckfbs()
   if(TYPERRS)return;
   for(ff=tl[files];ff!=NIL;ff=tl[ff])
   for(formals=fil_defs(hd[ff]);formals!=NIL;formals=tl[formals])
-  if(tag[n=hd[formals]]==ID)
+  if(tag[n=hd[formals]]==ID){
   if(id_type(n)==type_t)
     { if(t_class(n)==synonym_t)t_info(n)=meta_tcheck(t_info(n)); }
-  else id_type(n)=redtvars(meta_tcheck(id_type(n)));
+  else id_type(n)=redtvars(meta_tcheck(id_type(n)));}
 } /* wasteful if many includes */
 
 void redtfr(x) /* ensure types of freeids are in reduced form */
@@ -467,7 +467,7 @@ word tabstrs;
      	 printf("abstype declaration error: \"%s\" has a type unrelated to \
 the abstraction\n",get_id(hd[sigids])),
 	       sayhere(getspecloc(hd[sigids]),1),
-	       TYPERRS++; /* suppressed June 89, see karen.m, secret.m */
+	       TYPERRS++; // suppressed June 89, see karen.m, secret.m */
             rtypes=cons(rt,rtypes);
 	    sigids=tl[sigids]; }
        rtypes=reverse(rtypes);
@@ -484,7 +484,7 @@ word x;
   ATNAMES=shunt(hd[hd[x]],ATNAMES); */
   ATNAMES=hd[hd[x]];
   txchange(sigids,rtypes);  /* install representation types */
-  /* report_types("concrete signature:\n",sigids); /* DEBUG */
+  // report_types("concrete signature:\n",sigids); /* DEBUG */
   for(x=sigids;x!=NIL;x=tl[x])
      { word t,oldte=TYPERRS;
        current_id=hd[x];
@@ -533,13 +533,13 @@ word ids,x;
 void report_type(x)
 word x;
 { printf("%s",get_id(x));
-  if(id_type(x)==type_t)
+  if(id_type(x)==type_t){
   if(t_arity(x)>5)printf("(arity %ld)",t_arity(x));
   else { word i,j;
 	 for(i=1;i<=t_arity(x);i++)
 	    { putchar(' ');
 	      for(j=0;j<i;j++)putchar('*'); }
-       }
+       }}
   printf(" :: ");
   out_type(id_type(x));
 }
@@ -963,10 +963,10 @@ word ngt;     /* ngt is list of non-generic type variables */
 			   return(tf2(a,tf(a,b),b));
 	       /* G_RULE has same type as I */
 	       case G_CLOSE: a=NTV;
-			     if(col_fn) /* offside rule used */
+			     if(col_fn){/* offside rule used */
 			     if(col_fn== -1) /* arbitrary flag */
 			       TYPERRS++; /*overkill, see note on checkcolfn*/
-			     else checkcolfn();
+			     else checkcolfn();}
 			     return(tf3(ltchar,a,lt(bnf_t),a));
 	       case OFFSIDE: return(ltchar);
 			     /* pretend, used by indent, see prelude */
@@ -1036,8 +1036,8 @@ word p,t,e,ngt;
 void locate(s) /* for locating type errors */
 char *s;
 { TYPERRS++;
-  if(TYPERRS==1||lastloc!=current_id) /* avoid tedious repetition */
-    if(current_id)
+  if(TYPERRS==1||lastloc!=current_id){/* avoid tedious repetition */
+    if(current_id){
     if(tag[current_id]==DATAPAIR) /* see checkfbs */
       { locate_inc();
         printf("%s in binding for %s\n",s,(char *)hd[current_id]);
@@ -1052,8 +1052,8 @@ char *s;
 	     out_formal1(stdout,hd[x]),printf(", subdef of "),
 	     x=tl[x];
         printf("%s",get_id(x));
-        putchar('\n'); }
-    else printf("%s in expression\n",s);
+        putchar('\n'); }}
+    else printf("%s in expression\n",s);}
   if(lineptr)sayhere(lineptr,0); else
   if(current_id&&id_who(current_id)!=NIL)sayhere(id_who(current_id),0);
   lastloc=current_id;
@@ -1251,7 +1251,7 @@ int clear_SUBST()
 { word i;
   fixshows();
   for(i=0;i<hashsize;i++)SUBST[i]=0;
-  /*printf("tvcount=%d\n",tvcount);  /* probe */
+  /*printf("tvcount=%d\n",tvcount);  // probe */
   tvcount=1;
   return(0);  /* see defn of reset_SUBST */
 }
@@ -1447,7 +1447,7 @@ L:switch(tag[x])
 	     goto L;
   case ID: return(isconstructor(x)?d:add1(x,d));
   case LAMBDA: /* d=UNION(d,patdeps(hd[x])); 
-	       /* should add this - see sahbug3.m */
+	       // should add this - see sahbug3.m */
 	       return(rembvars(UNION(d,deps(tl[x])),hd[x]));
   case LET: d=rembvars(UNION(d,deps(tl[x])),dlhs(hd[x]));
             return(UNION(d,deps(dval(hd[x]))));
@@ -1564,7 +1564,7 @@ word x;
 	     x=tl[x]; fprintf(f,","); }
       out_pattern(f,hd[x]); fprintf(f,","); out_pattern(f,tl[x]); 
       fprintf(f,")"); } else
-  if(tag[x]==INT&&neg(x)||(tag[x]==DOUBLE&&get_dbl(x)<0))
+  if((tag[x]==INT&&neg(x))||(tag[x]==DOUBLE&&get_dbl(x)<0))
     { fprintf(f,"("); out(f,x); fprintf(f,")"); } /* -ve numbers */
   else
   out(f,x);  /* all other cases */
@@ -1642,8 +1642,8 @@ word t;
   default: if(tag[t]==ID)printf("%s",get_id(t));else
 	   if(isvar_t(t))
 	   { word n=gettvar(t);
-	   /*if(1)printf("t%d",n-1); else /* experiment, suppressed */
-	   /*if(n<=26)putchar('a'+n-1); else /* experiment */
+	   /*if(1)printf("t%d",n-1); else // experiment, suppressed */
+	   /*if(n<=26)putchar('a'+n-1); else // experiment */
 	     if(n>0&&n<7)while(n--)putchar('*'); /* 6 stars max */
 	     else printf("%ld",n); }else
            if(tag[t]==STRCONS)     /* pname - see hack in privatise */

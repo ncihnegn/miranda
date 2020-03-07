@@ -270,15 +270,15 @@ int subdir()
 
 void pushlast()
 { int n=strlen(last);
-  if(last[0]=='.')
+  if(last[0]=='.') {
     /* pathological cases */
     if(last[1]=='\0')return; else
     if(last[1]=='.'&&last[2]=='\0')
-      { poplast(); return; }
+      { poplast(); return; }}
   if(lastp+n>lastvec+100) /* overflow */
     { giveup=1; return; }
   /*if(strcmp(lastp,last)==0)
-    lastp+=n+1,strcpy(last,lastp); else /* here we were */
+    lastp+=n+1,strcpy(last,lastp); else // here we were */
     /* suppressed 'cos interferes with special case in lastval() */
   strcpy(lastp,last),lastp+=n+1,strcpy(last,".");
 }

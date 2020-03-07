@@ -51,7 +51,7 @@ execute_process(
 string(STRIP ${vdate} vdate)
 
 execute_process(
-  COMMAND ln -sf ${CMAKE_SOURCE_DIR}/miralib)
+  COMMAND ln -sfh ${CMAKE_SOURCE_DIR}/miralib)
 
 file(READ miralib/.version vers)
 

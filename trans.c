@@ -124,7 +124,7 @@ word x,e;
     case LEXER:
     case SHARE: fprintf(stderr,"impossible event in abstr (tag=%d)\n",tag[e]),
 		exit(1);
-    default: if(x==e||isvar_t(x)&&isvar_t(e)&&eqtvar(x,e))
+    default: if(x==e||(isvar_t(x)&&isvar_t(e)&&eqtvar(x,e)))
                return(I); /* see note */
              return(ap(K,e));
 }} /* note - we allow abstraction wrt tvars - see genshfns() */
@@ -274,7 +274,7 @@ word here,type;
 { word f;
   extern word ND;
   was_poly=0; f=mkshow(0,0,type);
-  /* printob("showfn=",f); /* DEBUG */
+  /* printob("showfn=",f); // DEBUG */
   if(here&&was_poly)
     { extern char *current_script;
       printf("type error in definition of %s\n",get_id(current_id));
@@ -356,7 +356,7 @@ void genshfns() /* called after meta type check - create show functions for
 	    while(tag[k]!=CONSTRUCTOR)k=tl[k];/* lawful and !'d constructors*/
 	    /* k now holds constructor(i,hd[r]) */
 	    /* k=constructor(hd[k],datapair(get_id(tl[k]),0));
-	      /* this `freezes' the name of the constructor */
+	      // this `freezes' the name of the constructor */
 	      /* incorrect, makes showfns immune to aliasing, should be
 		 done at mkshow time, not genshfn time - FIX LATER */
             while(isarrow_t(t))
@@ -492,19 +492,19 @@ word x,y;
   if(a&&y==I)return(tl[x]);
                /* rule 'eta */
   b1= tag[y]==AP&&tag[hd[y]]==AP&&hd[hd[y]]==B;
-  if(a)if(b1)return(ap3(B1,tl[x],tl[hd[y]],tl[y])); else
+  if(a){if(b1)return(ap3(B1,tl[x],tl[hd[y]],tl[y])); else
        /* Mark Scheevel's new B1 introduction rule -- adopted Aug 83 */
        if(tag[tl[x]]==AP&&tag[hd[tl[x]]]==AP&&hd[hd[tl[x]]]==COND)
 	 return(ap3(COND,tl[hd[tl[x]]],ap(K,tl[tl[x]]),y));
-       else return(ap2(B,tl[x],y));
+       else return(ap2(B,tl[x],y));}
   a1= tag[x]==AP&&tag[hd[x]]==AP&&hd[hd[x]]==B;
-  if(b)if(a1)if(tag[tl[hd[x]]]==AP&&hd[tl[hd[x]]]==COND)
+  if(b){if(a1){if(tag[tl[hd[x]]]==AP&&hd[tl[hd[x]]]==COND)
 	       return(ap3(COND,tl[tl[hd[x]]],tl[x],y));
-	     else return(ap3(C1,tl[hd[x]],tl[x],tl[y]));
-       else return(ap2(C,x,tl[y]));
-  if(a1)if(tag[tl[hd[x]]]==AP&&hd[tl[hd[x]]]==COND)
+	     else return(ap3(C1,tl[hd[x]],tl[x],tl[y]));}
+       else return(ap2(C,x,tl[y]));}
+  if(a1){if(tag[tl[hd[x]]]==AP&&hd[tl[hd[x]]]==COND)
 	  return(ap3(COND,tl[tl[hd[x]]],tl[x],y));
-	else return(ap3(S1,tl[hd[x]],tl[x],y));
+	else return(ap3(S1,tl[hd[x]],tl[x],y));}
   else return(ap2(S,x,y)); }
 
 word liscomb(x,y)  /* the CONSy analogue of "combine" */
@@ -514,8 +514,8 @@ word x,y;
   b=  tag[y]==AP&&hd[y]==K;
   if(a&&b)return(ap(K,cons(tl[x],tl[y])));
                        /* K propagation again */
-  if(a)if(y==I)return(ap(P,tl[x])); /* eta P - new rule added 20/11/88 */
-       else return(ap2(B_p,tl[x],y));
+  if(a){if(y==I)return(ap(P,tl[x])); /* eta P - new rule added 20/11/88 */
+       else return(ap2(B_p,tl[x],y));}
   if(b)return(ap2(C_p,x,tl[y]));
   return(ap2(S_p,x,y)); }
 /* B_p,C_p,S_p are the CONSy analogues of B,C,S
@@ -550,14 +550,14 @@ word e,qq,conc;
   q=hd[qq];
   if(hd[q]==GUARD)
     return(ap3(COND,tl[q],transzf(e,tl[qq],conc),NIL));
-  if(tl[qq]==NIL)
+  if(tl[qq]==NIL){
     if(hd[tl[q]]==e&&isvariable(e))return(tl[tl[q]]); /* Rule 1 */
     else if(irrefutable(hd[tl[q]]))
 	 return(ap2(MAP,lambda(hd[tl[q]],e),tl[tl[q]])); /* Rule 2 */
 	 else /* Rule 2 warped for refutable patterns */
-	 return(ap2(FLATMAP,lambda(hd[tl[q]],cons(e,NIL)),tl[tl[q]]));
+	 return(ap2(FLATMAP,lambda(hd[tl[q]],cons(e,NIL)),tl[tl[q]]));}
   q2=hd[tl[qq]];
-  if(hd[q2]==GUARD)
+  if(hd[q2]==GUARD){
     if(conc==concat) /* Rule 3 */
     { tl[tl[q]]=ap2(FILTER,lambda(hd[tl[q]],tl[q2]),tl[tl[q]]);
       tl[qq]=tl[tl[qq]];
@@ -565,7 +565,7 @@ word e,qq,conc;
     else  /* funny [//] version of Rule 3 to avoid creating weak lists */
     { e=ap3(COND,tl[q2],cons(e,NIL),NIL);
       tl[qq]=tl[tl[qq]];
-      return(transzf(e,qq,conc)); } /* plus wrap result with concat */
+      return(transzf(e,qq,conc)); }}/* plus wrap result with concat */
   return(ap(conc,transzf(transzf(e,tl[qq],conc),cons(q,NIL),conc)));
   /* Rule 4 */
 }
@@ -728,9 +728,9 @@ word e;
 word k(i,n)
 int i,n;
 { if(i==1)return(n==1?I:n==2?K:ap2(B,K,k(1,n-1)));
-  if(i==2&&n==2)return(KI); /* redundant but saves space *//*
+  if(i==2&&n==2)return(KI); // redundant but saves space *//*
   return(ap(K,k(i-1,n-1)));
-} /* not currently used */
+} // not currently used */
 
 #define arity_check if(t_arity(tf)!=arity)\
   printf("%ssyntax error: \
@@ -781,7 +781,7 @@ word block(defs,e,keep) /* semantics of "where" - performs dependency analysis *
 word defs,e,keep;
 { word ids=NIL,deftoids=NIL,g=NIL,d;
   extern word SYNERR,detrop;
-  /* return(letrec(defs,e)); /* release one semantics was just this */
+  /* return(letrec(defs,e)); // release one semantics was just this */
   if(SYNERR)return(NIL);  /* analysis falls over on empty patterns */
   for(d=defs;d!=NIL;d=tl[d])  /* first collect all ids defined in block */
      { word x = get_ids(dlhs(hd[d]));
