@@ -1,7 +1,6 @@
 *.o
 *.x
 .host
-fdate
 just
 mira
 miralib/menudriver

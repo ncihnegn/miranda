@@ -24,34 +24,21 @@ execute_process(
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   RESULT_VARIABLE byacc)
 if(byacc)
-  message(STATUS "byacc fails")
+  message(FATAL_ERROR "Fail to run byacc")
 endif()
 
 execute_process(
-  COMMAND cc fdate.c -o fdate
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  RESULT_VARIABLE fdate)
-if(${fdate})
-  message(STATUS "Fail to build fdate")
-endif()
-
-execute_process(COMMAND ./hostinfo WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                                                     OUTPUT_FILE .host)
-
-execute_process(
-  COMMAND ./quotehostinfo
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMAND sh -c "echo compiled: `date` && ${CMAKE_C_COMPILER} -v 2>&1"
   OUTPUT_VARIABLE host)
-string(STRIP ${host} host)
+string(REPLACE "\n" "\\n" host ${host})
 
-execute_process(
-  COMMAND ./revdate
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE vdate)
+execute_process(COMMAND git show -s --format=%cd --date=format:"%d %b %Y"
+                OUTPUT_VARIABLE vdate)
 string(STRIP ${vdate} vdate)
 
-execute_process(
-  COMMAND ln -sfh ${CMAKE_SOURCE_DIR}/miralib)
+if(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR}))
+  execute_process(COMMAND ln -sfh ${CMAKE_SOURCE_DIR}/miralib)
+endif()
 
 file(READ miralib/.version vers)
 
@@ -68,10 +55,11 @@ add_executable(
   utf8.c
   version.c
   y.tab.c)
-target_compile_definitions(mira PRIVATE VERS=${vers} VDATE="${vdate}"
-                                        HOST=${host})
+target_compile_definitions(mira PRIVATE VERS=${vers} VDATE=${vdate}
+                                        HOST="${host}")
 target_compile_options(mira PRIVATE -O2)
 
-add_custom_target(examples
+add_custom_target(
+  examples
   COMMAND ./mira -make -lib miralib ex/*.m
   DEPENDS mira)
