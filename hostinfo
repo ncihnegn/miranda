@@ -1,5 +1,0 @@
-echo host: `uname -m` `uname -s` `uname -r`
-fil=/tmp/hostinfo$$
-gcc -v 2> $fil
-tail -1 $fil
-rm $fil

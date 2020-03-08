@@ -17,7 +17,7 @@ YACC = byacc #Berkeley yacc, gnu yacc not compatible
 # -Dsparc7 needed for Solaris 2.7
 # -Dsparc8 needed for Solaris 2.8 or later
 mira: big.o cmbnms.o data.o lex.o reduce.o steer.o trans.o types.o utf8.o y.tab.o \
-			    version.c miralib/.version .host Makefile
+			    version.c miralib/.version Makefile
 	$(CC) $(CFLAGS) -DVERS=`cat miralib/.version` \
         -DVDATE="\"`git show -s --format=%cd --date=format:'%d %b %Y'`\"" \
 		-DHOST="`./quotehostinfo`" version.c cmbnms.o y.tab.o data.o lex.o \
@@ -34,8 +34,6 @@ utf8.o: utf8.h Makefile
 cmbnms.o: cmbnms.c Makefile
 cmbnms.c combs.h: gencdecs
 	./gencdecs
-.host: hostinfo
-	./hostinfo > .host
 miralib/menudriver: menudriver.c Makefile
 	$(CC) $(CFLAGS) menudriver.c -o miralib/menudriver
 	chmod 755 miralib/menudriver$(EX)
@@ -46,7 +44,7 @@ tellcc:
 	@echo $(CC) $(CFLAGS)
 cleanup:
 #to be done on moving to a new host
-	-rm -rf *.o .host miralib/menudriver mira$(EX)
+	-rm -rf *.o miralib/menudriver mira$(EX)
 	./unprotect
 	-rm -f miralib/preludx miralib/stdenv.x miralib/ex/*.x #miralib/ex/*/*.x
 install:
