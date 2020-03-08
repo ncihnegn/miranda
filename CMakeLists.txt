@@ -28,6 +28,14 @@ if(byacc)
 endif()
 
 execute_process(
+  COMMAND ./gencdecs
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  RESULT_VARIABLE gencdecs)
+if(gencdecs)
+  message(FATAL_ERROR "Fail to run gencdecs")
+endif()
+
+execute_process(
   COMMAND sh -c "echo compiled: `date` && ${CMAKE_C_COMPILER} -v 2>&1"
   OUTPUT_VARIABLE host)
 string(REPLACE "\n" "\\n" host ${host})

@@ -44,7 +44,7 @@ tellcc:
 	@echo $(CC) $(CFLAGS)
 cleanup:
 #to be done on moving to a new host
-	-rm -rf *.o miralib/menudriver mira$(EX)
+	-rm -rf *.o miralib/menudriver mira$(EX) cmbnms.c combs.h y.tab.*
 	./unprotect
 	-rm -f miralib/preludx miralib/stdenv.x miralib/ex/*.x #miralib/ex/*/*.x
 install:
