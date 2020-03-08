@@ -60,7 +60,6 @@ add_executable(
   steer.c
   trans.c
   types.c
-  utf8.c
   version.c
   y.tab.c)
 target_compile_definitions(mira PRIVATE VERS=${vers} VDATE=${vdate}

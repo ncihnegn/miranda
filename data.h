@@ -21,7 +21,7 @@ typedef long word;
 extern YYSTYPE yylval;
 #include "y.tab.h" /* for tokens */
 #include "combs.h" /* for combinators */
-#include "utf8.h"  /* for UMAX etc */
+#define UMAX 0x10ffff /* last unicode value */
 #include ".xversion"
    /* #define for XVERSION - we increase this by one at each non upwards
       compatible change to dump format */

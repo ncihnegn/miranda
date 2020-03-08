@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <wchar.h>
 struct stat buf;  /* used only by code for FILEMODE, FILESTAT in reduce */
 #include "data.h"
 #include "big.h"
@@ -227,7 +228,7 @@ word e;
 { e= reduce(e);
   while(tag[e]==CONS && is_char(hd[e]=reduce(hd[e])))
   { unsigned c=get_char(hd[e]);
-    if(UTF8)outUTF8(c,s_out); else
+    if(UTF8)fputwc(c,s_out); else
     if(c<256) putc(c,s_out);
     else fprintf(stderr,"\n warning: non Latin1 char \%x in print, ignored\n",c);
     e= tl[e]= reduce(tl[e]); }
@@ -771,7 +772,7 @@ word e;
           { hd[e]=I; e=tl[e]=NIL; goto DONE; }
 	stdinuse='-';
 	tl[e]=(word)stdin; }
-    hold=UTF8?sto_char(fromUTF8((FILE *)lastarg)):getc((FILE *)lastarg);
+    hold=UTF8?sto_char(fgetwc((FILE *)lastarg)):getc((FILE *)lastarg);
     if(hold==EOF)
      {   fclose((FILE *)lastarg);
          hd[e]=I;
