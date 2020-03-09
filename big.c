@@ -13,6 +13,7 @@
 #include "lex.h"
 #include "big.h"
 #include <errno.h>
+#include <math.h>
 
 static double logIBASE,log10IBASE;
 word big_one;

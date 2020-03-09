@@ -45,7 +45,7 @@ execute_process(COMMAND git show -s --format=%cd --date=format:"%d %b %Y"
 string(STRIP ${vdate} vdate)
 
 if(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR}))
-  execute_process(COMMAND ln -sfh ${CMAKE_SOURCE_DIR}/miralib)
+  execute_process(COMMAND ln -sf ${CMAKE_SOURCE_DIR}/miralib)
 endif()
 
 file(READ miralib/.version vers)
@@ -65,6 +65,7 @@ add_executable(
 target_compile_definitions(mira PRIVATE VERS=${vers} VDATE=${vdate}
                                         HOST="${host}")
 target_compile_options(mira PRIVATE -O2)
+target_link_libraries(mira m)
 
 add_custom_target(
   examples
