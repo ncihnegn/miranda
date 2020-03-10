@@ -44,16 +44,13 @@ tellcc:
 cleanup:
 #to be done on moving to a new host
 	-rm -rf *.o miralib/menudriver mira$(EX) cmbnms.c combs.h y.tab.*
-	./unprotect
 	-rm -f miralib/preludx miralib/stdenv.x miralib/ex/*.x #miralib/ex/*/*.x
 install:
 	make -s all
 	cp mira$(EX) /$(BIN)
 	cp mira.1 /$(MAN)
 	rm -rf /$(LIB)/miralib
-	./protect
 	cp -pPR miralib /$(LIB)/miralib
-	./unprotect
 	find /$(LIB)/miralib -exec chown `./ugroot` {} \;
 release:
 	make -s all
@@ -61,9 +58,7 @@ release:
 	mkdir -p $(BIN) $(LIB) $(MAN)
 	cp mira$(EX) $(BIN)
 	cp mira.1 $(MAN)
-	./protect
 	cp -pPR miralib $(LIB)/miralib
-	./unprotect
 	find usr -exec chown `./ugroot` {} \;
 	tar czf `rname`.tgz ./usr
 	-rm -rf usr
