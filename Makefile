@@ -17,12 +17,18 @@ YACC = byacc #Berkeley yacc, gnu yacc not compatible
 # -Dsparc7 needed for Solaris 2.7
 # -Dsparc8 needed for Solaris 2.8 or later
 mira: big.o cmbnms.o data.o lex.o reduce.o steer.o trans.o types.o y.tab.o \
-			    version.c miralib/.version Makefile
+			    version.c miralib/.version Makefile .host
 	$(CC) $(CFLAGS) -DVERS=`cat miralib/.version` \
         -DVDATE="\"`git show -s --format=%cd --date=format:'%d %b %Y'`\"" \
-		-DHOST="`./quotehostinfo`" version.c cmbnms.o y.tab.o data.o lex.o \
+		-DHOST="`cat .host`" version.c cmbnms.o y.tab.o data.o lex.o \
 	    big.o reduce.o steer.o trans.o types.o -lm -o mira
 	strip mira$(EX)
+.host:
+	@echo compiled: `date` > .host
+	@echo $(CC) $(CFLAGS) >> .host
+	$(CC) -v 2>> .host
+	sed -i 's/.*/&\\\\n/' .host
+	sed -i 's/\\n /\\n/g' .host
 y.tab.c y.tab.h: rules.y
 	$(YACC) -d rules.y
 big.o cmbns.o data.o lex.o reduce.o steer.o trans.o types.o y.tab.o: \
@@ -51,7 +57,6 @@ install:
 	cp mira.1 /$(MAN)
 	rm -rf /$(LIB)/miralib
 	cp -pPR miralib /$(LIB)/miralib
-	find /$(LIB)/miralib -exec chown `./ugroot` {} \;
 release:
 	make -s all
 	-rm -rf usr
@@ -59,7 +64,6 @@ release:
 	cp mira$(EX) $(BIN)
 	cp mira.1 $(MAN)
 	cp -pPR miralib $(LIB)/miralib
-	find usr -exec chown `./ugroot` {} \;
 	tar czf `rname`.tgz ./usr
 	-rm -rf usr
 SOURCES = .xversion big.c big.h gencdecs data.h data.c lex.h lex.c reduce.c rules.y \

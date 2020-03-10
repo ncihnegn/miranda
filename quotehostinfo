@@ -1,7 +1,0 @@
-#!/bin/bash
-fil=/tmp/quotehostinfo$$
-echo compiled: `date` > $fil
-make -s tellcc >> $fil
-gcc -v 2>> $fil
-echo \"`cat $fil | sed 's/.*/&\\\\n/'`\" | sed 's/\\n /\\n/g'
-rm $fil
