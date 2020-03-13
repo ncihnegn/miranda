@@ -68,7 +68,6 @@ void setupdic()
 #include <pwd.h>
 struct passwd *getpwnam();
 #endif
-char *getenv();
 
 char *gethome(n) /* for expanding leading `~' in tokens and pathnames */
 char *n;
