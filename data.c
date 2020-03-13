@@ -131,14 +131,6 @@ unsigned char t; word x,y;
   tl[listp]= y;
   return(listp); }
 
-/* cons ap ap2 ap3 are all #defined in terms of make
-   - see MIRANDA DECLARATIONS */
-
-void setwd(x,a,b)
-word x,a,b;
-{ hd[x]= a;
-  tl[x]= b; }
-
 int collecting=0;  /* flag for reset(), in case interrupt strikes in gc */
 
 void gc()       /*  the "garbage collector"  */

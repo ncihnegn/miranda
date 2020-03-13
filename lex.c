@@ -1023,14 +1023,6 @@ word x;
   return(name());
 }
 
-int isnonterminal(x)
-word x;
-{ char *n;
-  if(tag[x]!=ID)return(0);
-  n = get_id(x);
-  return(n[strlen(n)-1]==' ');
-}
-
 word name()
 { word q,h;
   q= namebucket[h=hash(dicp)];

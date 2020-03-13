@@ -598,15 +598,6 @@ word x;
   return(t);
 }
 
-word checktype(x)  /* is expression x well-typed ? */
-           /* not currently used */
-word x;
-{ TYPERRS=0;
-  etype(x,NIL,NIL);
-  reset_SUBST;
-  return(!TYPERRS);
-}
-
 #define bound_t(t) (iscompound_t(t)&&hd[t]==bind_t)
 #define tf(a,b) ap2(arrow_t,a,b)
 #define tf2(a,b,c) tf(a,tf(b,c))

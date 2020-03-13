@@ -1779,15 +1779,6 @@ word t,x;
   }
 }
 
-#define mask(c) (c&0xDF)
-/* masks out lower case bit, which is 0x20  */
-word alfa_ls(a,b)  /* 'DICTIONARY ORDER' - not currently used */
-char *a,*b;
-{ while(*a&&mask(*a)==mask(*b))a++,b++;
-  if(mask(*a)==mask(*b))return(strcmp(a,b)<0); /* lower case before upper */
-  return(mask(*a)<mask(*b));
-}
-
 word alfasort(x) /* also removes non_IDs from result */
 word x;
 { word a=NIL,b=NIL,hold=NIL;
