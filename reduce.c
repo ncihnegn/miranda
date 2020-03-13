@@ -181,7 +181,7 @@ word e;
   cstack = &e; /* don't follow C stack below this in gc */
 L:e= reduce(e);
   while(tag[e]==CONS)
-  { word d;
+  {
     hd[e]= reduce(hd[e]);
     switch(constr_tag(head(hd[e])))
     { case Stdout: print(tl[hd[e]]);
@@ -1720,7 +1720,6 @@ L3: if(arg1==NIL)lexfail(lastarg);
           setcell(CONS,ap(READ,fp),cons(ap(READ,fp_a),ap(WAIT,pid)));
         }
       else { /* child (writer) */
-             word in;
              static char *shell="/bin/sh";
              dup2(fd[1],1); /* so pipe replaces stdout */
              dup2(fd_a[1],2); /* 2nd pipe replaces stderr */

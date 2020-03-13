@@ -149,7 +149,7 @@ void
 getln(fp,crush)
 FILE *fp;
 int crush;
-{ char *lose=fgets(bp,MAXBUF-MAXWIDTH+(buf-bp),fp);
+{
   if(index(bp,'\t')&&indent(bp)<=THRESHOLD&&bp[0]!='>')
     { /* line contains tabs and is not frozen */
       char *p;

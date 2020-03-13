@@ -801,7 +801,7 @@ word defs,e,keep;
    where defs are all on which def immediately depends, plus self */
   g = tclos(g);  /* now g is list(cons(def,ultdefs)) */
   { /* check for unused definitions */
-    word x=intersection(deps(e),ids),y=NIL,*g1= &g;
+    word x=intersection(deps(e),ids),y=NIL;//*g1= &g;
     for(;x!=NIL;x=tl[x])
        { word d=invgetrel(deftoids,hd[x]);
          if(!member(y,d))y=UNION(y,getrel(g,d)); }

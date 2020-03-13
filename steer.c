@@ -155,12 +155,10 @@ char *argv[];
 { word manonly=0;
   char *home, *prs;
   int okhome_rc; /* flags valid HOME/.mirarc file present */
-  char *argv0=argv[0];
   char *initscript;
   int badlib=0;
   extern int ARGC; extern char **ARGV;
   extern word newtyps,algshfns;
-  char *progname=rindex(argv[0],'/');
   cstack= &manonly;
 /* used to indicate the base of the C stack for garbage collection purposes */
   verbosity=isatty(0);

@@ -71,9 +71,10 @@ struct passwd *getpwnam();
 
 char *gethome(n) /* for expanding leading `~' in tokens and pathnames */
 char *n;
-{ struct passwd *pw;
+{
   if(n[0]=='\0')return(getenv("HOME"));
 #ifdef okgetpwnam
+  struct passwd *pw;
   if(pw=getpwnam(n))return(pw->pw_dir); 
 #endif
   return(NULL);
@@ -950,7 +951,7 @@ void numeral()
 }
 
 void hexnumeral()   /* added 21.11.2013 */
-{ word nflag=1;
+{
   dicq= dicp;
   *dicq++ = c, c=getch(); /* 0 */
   *dicq++ = c, c=getch(); /* x */
@@ -982,7 +983,7 @@ void hexnumeral()   /* added 21.11.2013 */
 }
 
 void octnumeral()   /* added 21.11.2013 */
-{ word nflag=1;
+{
   dicq= dicp;
   if(!isdigit(c))syntax("malformed octal number\n");
   while(c=='0'&&isdigit(peekch()))c=getch(); /* skip zeros before first nonzero digit */
@@ -1094,7 +1095,7 @@ word n;
 void mkprivate(x) /* disguise identifiers prior to removal from environment */
 word x;       /* used in setting up prelude - see main() in steer.c */
 { while(x!=NIL)
-  { char *s = get_id(hd[x]);
+  {
     get_id(hd[x])[0] += 128;  /* hack to make private internal name */
     x = tl[x]; }                /* NB - doesn't change hashbucket */
   inprelude=0;
