@@ -1674,7 +1674,7 @@ L3: if(arg1==NIL)lexfail(lastarg);
 			      (see man (2) getenv)    */
     UPLEFT;
     { char *a = getstring(lastarg,"getenv");
-      unsigned char *p = getenv(a);
+      unsigned char *p = (unsigned char*)getenv(a);
       hold = NIL;
       if(p){ word i;
 	     unsigned char *q=p, *r=p;
@@ -1690,7 +1690,7 @@ L3: if(arg1==NIL)lexfail(lastarg);
 	       *q='\0';
 	     }
 	     /* convert p to list */
-	     i = strlen(p);
+	     i = strlen((char*)p);
 	     while(i--)hold=cons(p[i],hold);
 	   }
     }
