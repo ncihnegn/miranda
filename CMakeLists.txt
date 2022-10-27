@@ -45,7 +45,7 @@ execute_process(COMMAND git show -s --format=%cd --date=format:"%d %b %Y"
 string(STRIP ${vdate} vdate)
 
 if(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR}))
-  execute_process(COMMAND ln -sf ${CMAKE_SOURCE_DIR}/miralib)
+  execute_process(COMMAND ln -sf ${CMAKE_SOURCE_DIR}/miralib ${CMAKE_BINARY_DIR}/miralib)
 endif()
 
 file(READ miralib/.version vers)
