@@ -1,4 +1,4 @@
-#! /home/dat/mira/states/src/miranda/mira -exec
+#!/usr/bin/env -S mira -exec
 || Contributed by John Cupitt, University of Kent
 
 ||A while ago Steve Hill (I think) appealed for useful Miranda programs
