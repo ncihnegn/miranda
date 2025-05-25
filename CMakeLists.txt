@@ -15,9 +15,11 @@ if(${clangtidy})
 endif()
 
 add_executable(just just.c)
+target_compile_options(just PRIVATE -O2 -Wno-deprecated-non-prototype)
 
 add_executable(menudriver menudriver.c)
 set_target_properties(menudriver PROPERTIES RUNTIME_OUTPUT_DIRECTORY miralib)
+target_compile_options(menudriver PRIVATE -O2 -Wno-deprecated-non-prototype)
 
 execute_process(
   COMMAND byacc -d rules.y
