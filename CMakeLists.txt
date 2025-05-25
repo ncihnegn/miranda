@@ -15,11 +15,15 @@ if(${clangtidy})
 endif()
 
 add_executable(just just.c)
-target_compile_options(just PRIVATE -O2 -Wno-deprecated-non-prototype)
+if (CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+  target_compile_options(just PRIVATE -O2 -Wno-deprecated-non-prototype)
+endif()
 
 add_executable(menudriver menudriver.c)
 set_target_properties(menudriver PROPERTIES RUNTIME_OUTPUT_DIRECTORY miralib)
-target_compile_options(menudriver PRIVATE -O2 -Wno-deprecated-non-prototype)
+if (CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+  target_compile_options(menudriver PRIVATE -O2 -Wno-deprecated-non-prototype)
+endif()
 
 execute_process(
   COMMAND byacc -d rules.y
@@ -66,7 +70,11 @@ add_executable(
   y.tab.c)
 target_compile_definitions(mira PRIVATE VERS=${vers} VDATE=${vdate}
                                         HOST="${host}")
-target_compile_options(mira PRIVATE -O2 -Wno-deprecated-non-prototype -fcommon)
+if (CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+  target_compile_options(mira PRIVATE -O2 -Wno-deprecated-non-prototype)
+else()
+  target_compile_options(mira PRIVATE -O2 -fcommon)
+endif()
 target_link_libraries(mira m)
 
 add_custom_target(
