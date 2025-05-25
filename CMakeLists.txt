@@ -64,7 +64,7 @@ add_executable(
   y.tab.c)
 target_compile_definitions(mira PRIVATE VERS=${vers} VDATE=${vdate}
                                         HOST="${host}")
-target_compile_options(mira PRIVATE -O2 -fcommon)
+target_compile_options(mira PRIVATE -O2 -Wno-deprecated-non-prototype -fcommon)
 target_link_libraries(mira m)
 
 add_custom_target(
