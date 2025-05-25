@@ -655,7 +655,7 @@ FILE *f;
 	           return;
     case FILEINFO: { word line=tl[x];
 		     if((char *)hd[x]==CFN)putc(HERE_X,f);
-		     else fprintf(f,"%c%s",HERE_X,mkrel(hd[x]));
+		     else fprintf(f,"%c%s",HERE_X,mkrel((char *)hd[x]));
 		     putc(0,f);
 		     putc(line&255,f);
 		     putc((line >>= 8)&255,f);
