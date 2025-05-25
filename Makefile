@@ -9,7 +9,7 @@ MAN=usr/share/man/man1
 #LIB=usr/local/lib#beware no spaces after LIB
 #MAN=usr/local/man/man1
 CC = gcc -w
-CFLAGS = #-O #-DCYGWIN #-DUWIN #-DIBMRISC #-Dsparc7 #-Dsparc8
+CFLAGS = -fcommon -O2 #-DCYGWIN #-DUWIN #-DIBMRISC #-Dsparc7 #-Dsparc8
 #be wary of using anything higher than -O as the garbage collector may fall over
 #if using gcc rather than clang try without -O first
 EX = #.exe        #needed for CYGWIN, UWIN
@@ -20,15 +20,16 @@ mira: big.o cmbnms.o data.o lex.o reduce.o steer.o trans.o types.o y.tab.o \
 			    version.c miralib/.version Makefile .host
 	$(CC) $(CFLAGS) -DVERS=`cat miralib/.version` \
         -DVDATE="\"`git show -s --format=%cd --date=format:'%d %b %Y'`\"" \
-		-DHOST="`cat .host`" version.c cmbnms.o y.tab.o data.o lex.o \
+		-DHOST="\"`cat .host`\"" version.c cmbnms.o y.tab.o data.o lex.o \
 	    big.o reduce.o steer.o trans.o types.o -lm -o mira
 	strip mira$(EX)
 .host:
 	@echo compiled: `date` > .host
 	@echo $(CC) $(CFLAGS) >> .host
 	$(CC) -v 2>> .host
-	sed -i 's/.*/&\\\\n/' .host
-	sed -i 's/\\n /\\n/g' .host
+	sed -i.bak 's/.*/&\\n/' .host
+	tr -d '\n' < .host > .tmp
+	mv .tmp .host
 y.tab.c y.tab.h: rules.y
 	$(YACC) -d rules.y
 big.o cmbns.o data.o lex.o reduce.o steer.o trans.o types.o y.tab.o: \
